@@ -88,9 +88,11 @@ class VideoApp(ctk.CTk):
         if self.frame is not None:
             self.photo = Image.fromarray(self.frame)        
             image = scan(np.array(self.frame))
-            self.contour_label.configure(image=image)
-            self.contour_label.image = image
-            self.shape_preview = calcul_trajectoire(image, preview=True)
+            print(type(image))
+            truc = Image.fromarray(image)
+            self.contour_label.configure(image=truc)
+            self.contour_label.image = truc
+            #self.shape_preview = calcul_trajectoire(image, preview=True)
         self.display_photo = True
         return
 
