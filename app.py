@@ -76,12 +76,12 @@ class VideoApp(ctk.CTk):
         if self.photo is not None:
             print(self.photo)
             print(self.dropdown_type.get())
-
         return
     
     def take_photo(self):
         if self.frame is not None:
             self.photo = Image.fromarray(self.frame)
+            self.shape_preview = calcul_trajectoire(self.photo, )
         self.display_photo = True
         return
 
