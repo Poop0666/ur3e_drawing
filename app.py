@@ -82,7 +82,7 @@ class VideoApp(ctk.CTk):
     def take_photo(self):
         if self.frame is not None:
             self.photo = Image.fromarray(self.frame)
-            self.display_photo = True
+        self.display_photo = True
         return
 
     def refresh_cameras(self):
@@ -103,6 +103,8 @@ class VideoApp(ctk.CTk):
         if self.cap is not None:
             self.cap.release()
         self.cap = cv2.VideoCapture(int(choice), cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     
     def capture_video(self):
         """ Capture video frames in a separate thread to improve UI responsiveness. """
