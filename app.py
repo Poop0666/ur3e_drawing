@@ -1,18 +1,21 @@
 import os
 os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
 import cv2
-import customtkinter as ctk
-from PIL import Image
-from cameras import get_cameras
 import threading
 from tooltip import Tooltip
+import customtkinter as ctk
+import numpy as np
+from PIL import Image
+from cameras import get_cameras
+from detection_dessin import scan
+from trajectoire.calcul_trajectoire import calcul_trajectoire
 import cProfile, pstats
 
 class VideoApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Live Video in CustomTkinter")
+        self.title("Drawing with UR3E")
         self.geometry("1280x720")
 
         # Configure Grid
@@ -57,6 +60,9 @@ class VideoApp(ctk.CTk):
         self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing)
         self.button3.grid(column=0, pady=5, sticky="ew")
 
+        self.contour_label = ctk.CTkLabel(self.controls_frame, text="AA", font=('Arial', 50))
+        self.contour_label.grid(column=0, padx=20, pady=10, sticky="ew")
+
         # Video Capture
         self.refresh_cameras()
             
@@ -80,8 +86,11 @@ class VideoApp(ctk.CTk):
     
     def take_photo(self):
         if self.frame is not None:
-            self.photo = Image.fromarray(self.frame)
-            self.shape_preview = calcul_trajectoire(self.photo, )
+            self.photo = Image.fromarray(self.frame)        
+            image = scan(np.array(self.frame))
+            self.contour_label.configure(image=image)
+            self.contour_label.image = image
+            self.shape_preview = calcul_trajectoire(image, preview=True)
         self.display_photo = True
         return
 
@@ -121,7 +130,7 @@ class VideoApp(ctk.CTk):
         """ Update the UI with the latest frame. """
         try:
             if self.display_photo:
-                self.self.video_label.configure(image=self.photo)
+                self.video_label.configure(image=self.photo)
                 self.video_label.image = self.photo
             elif self.frame is not None:
                 width = self.preview_frame.winfo_width()
