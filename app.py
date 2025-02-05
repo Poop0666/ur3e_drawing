@@ -75,14 +75,14 @@ class VideoApp(ctk.CTk):
     def start_drawing(self):
         if self.photo is not None:
             print(self.photo)
-            print(self.photo._size)
             print(self.dropdown_type.get())
 
         return
     
     def take_photo(self):
-        self.photo = Image.fromarray(self.frame)
-        self.display_photo = True
+        if self.frame is not None:
+            self.photo = Image.fromarray(self.frame)
+            self.display_photo = True
         return
 
     def refresh_cameras(self):
