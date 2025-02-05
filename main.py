@@ -12,7 +12,7 @@ def test(trajectoire):
     con.sendCoordonates(trajectoire)
 
 def main(allProgram = False):
-    image = cv2.imread("chat.png", cv2.IMREAD_GRAYSCALE)
+    image = cv2.imread("pika.jpg", cv2.IMREAD_GRAYSCALE)
     trajectoire = calcul_trajectoire(image)
     
     setp1 = [0.250, 0.100, 0.040, 0, 0, 0]
