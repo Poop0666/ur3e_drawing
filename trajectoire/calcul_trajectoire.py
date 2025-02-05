@@ -6,7 +6,7 @@ try:
 except:
     from trajMaker import getTraj
 
-def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = False):            
+def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = False, preview = False):            
     # Preprocess the image (edge detection or thresholding)
     canny = cv2.Canny(image, 50, 150)  # Use Canny edge detection
     
@@ -60,6 +60,7 @@ def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = Fa
                 trajectory.append((normalized_x, normalized_y))
         if trajectory != []:
             all_trajectories.append(trajectory)
+            
 
     if show:
         # Optional: Visualize the trajectories
@@ -77,14 +78,30 @@ def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = Fa
         plt.grid()
         plt.axis('equal')
         plt.show()
+        
+    if preview:
+        import matplotlib.pyplot as plt
+        plt.figure(figsize=(8, 8))
+        for trajectory in all_trajectories:
+            trajectory = np.array(trajectory)
+            plt.plot(trajectory[:, 0], trajectory[:, 1], linewidth=1)
+
+        plt.axis("off")
+    
+        canvas = plt.gca().figure.canvas
+        canvas.draw()
+        data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
+        previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
+        return previsualisation
+        
 
     return getTraj(all_trajectories, height, width)
 
 if __name__ == "__main__":
     # Load the image
-    image_path = 'chat.png'
+    image_path = 'image/chat.png'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = calcul_trajectoire(image, 5, "bluredcanny", show=True)
+    traj = calcul_trajectoire(image, 5, "bluredcanny", preview=True)
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     print(traj)
