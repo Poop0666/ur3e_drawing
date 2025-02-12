@@ -88,14 +88,10 @@ class VideoApp(ctk.CTk):
         if self.frame is not None:
             cv2.imwrite("bounce.jpg",self.frame)
             self.photo = Image.fromarray(self.frame)        
-            image = scan(self.frame)
-            cv2.imshow("temp",image)
-            cv2.imwrite("temp.png",image)
-            cv2.waitKey(0)
-            self.shape_preview = calcul_trajectoire(np.array(image).astype("CV_8UC1"), preview=True)
-            image_tr = ctk.CTkImage(light_image=self.shape_preview, size=(100, 100))
-            self.contour_label.configure(image=image_tr)
-            self.contour_label.image = image_tr
+            image = scan(np.array(self.frame))
+            self.contour_label.configure(image=image)
+            self.contour_label.image = image
+            self.shape_preview = calcul_trajectoire(image, preview=True)
         self.display_photo = True
         return
 
