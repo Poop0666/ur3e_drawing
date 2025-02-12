@@ -33,7 +33,7 @@ def find_dest(pts):
     destination_corners = [[0, 0], [maxWidth, 0], [maxWidth, maxHeight], [0, maxHeight]]
     return order_points(destination_corners)
 
-def scan(img):
+def scan(img: np.ndarray):
     orig_img = img.copy()
     # Repeated Closing operation to remove text from the document.
     kernel = np.ones((5, 5), np.uint8)

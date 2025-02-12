@@ -101,7 +101,7 @@ if __name__ == "__main__":
     # Load the image
     image_path = 'image/chat.png'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = calcul_trajectoire(image, 5, "bluredcanny", preview=True)
+    traj = calcul_trajectoire(image, 50, "bluredcanny", show=True)
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     print(traj)
