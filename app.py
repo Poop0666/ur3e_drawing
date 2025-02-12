@@ -5,10 +5,9 @@ import threading
 from tooltip import Tooltip
 import customtkinter as ctk
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from cameras import get_cameras
-from detection_dessin import scan
-from trajectoire.calcul_trajectoire import calcul_trajectoire
+from linedraw.linedraw import sketch
 import cProfile, pstats
 
 class VideoApp(ctk.CTk):
@@ -50,7 +49,7 @@ class VideoApp(ctk.CTk):
         self.processing_label = ctk.CTkLabel(self.controls_frame, text="Select the type of image processing")
         self.processing_label.grid(column=0, padx=20, pady=5, sticky="ew")
 
-        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel"], state="readonly")
+        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly")
         self.dropdown_type.grid(column=0, pady=5, sticky="ew")
         self.dropdown_type.set("bluredcanny")
 
@@ -86,12 +85,14 @@ class VideoApp(ctk.CTk):
     
     def take_photo(self):
         if self.frame is not None:
-            cv2.imwrite("bounce.jpg",self.frame)
-            self.photo = Image.fromarray(self.frame)        
-            image = scan(np.array(self.frame))
-            self.contour_label.configure(image=image)
-            self.contour_label.image = image
-            self.shape_preview = calcul_trajectoire(image, preview=True)
+            self.photo = Image.fromarray(self.frame)    
+            if self.dropdown_type.get() == "linedraw":
+                lines = sketch(self.photo)
+                disp = Image.new("RGB",(1280,720),(255,255,255))
+                draw = ImageDraw.Draw(disp)
+                for l in lines:
+                    draw.line(l,(0,0,0),5)
+                disp.show()
         self.display_photo = True
         return
 
