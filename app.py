@@ -55,7 +55,7 @@ class VideoApp(ctk.CTk):
 
         self.checkbox_hatch_linedraw = ctk.CTkCheckBox(self.controls_frame, text="Hatch linedraw", variable=ctk.BooleanVar(value=True))
         self.checkbox_hatch_linedraw.grid(column=0, pady=5, sticky="ew")
-        #self.checkbox_hatch_linedraw.grid_remove()
+        self.checkbox_hatch_linedraw.grid_remove()
         
         self.slider_label = ctk.CTkLabel(self.controls_frame, text="Select the simplification of the processing")
         self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
@@ -71,11 +71,13 @@ class VideoApp(ctk.CTk):
         
         self.treated_label = ctk.CTkLabel(self.controls_frame, text="")
         self.treated_label.grid(column=0, sticky="ew")
+        self.treated_label.bind("<Button-1>", self.inverse_screens)
 
         self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing, state="disabled")
         self.button3.grid(column=0, pady=5, sticky="ew")
 
 
+        self.image_label_inversed = False
         # Video Capture
         self.refresh_cameras()
             
@@ -95,6 +97,7 @@ class VideoApp(ctk.CTk):
         
         self.frame_4_preview = None
         self.ctk_treated_image = None
+
         
         # Needed for the slider's callback
         self.timer = None
@@ -118,11 +121,11 @@ class VideoApp(ctk.CTk):
         self.cap=None
         if len(self.cameras) > 0:
             self.dropdown_cameras.configure(values=list(map(str,self.cameras)), variable=ctk.StringVar(value="0"))
-            self.video_label.configure(text="")
+            self.get_label("video")[1].configure(text="")
             self.select_cam(0)
         else :
             self.dropdown_cameras.configure(values=[], variable=ctk.StringVar(value=""))
-            self.video_label.configure(text = "No camera detected")
+            self.get_label("video")[1].configure(text = "No camera detected")
 
     def select_cam(self, choice):
         """ Switch camera source. """
@@ -147,11 +150,12 @@ class VideoApp(ctk.CTk):
         """ Update the UI with the latest frame. """
         try:
             if self.display_photo:
-                self.ctk_img = ctk.CTkImage(light_image=self.photo, size=(width, height))
-                self.video_label.configure(image=self.ctk_img)
-                self.video_label.image = self.photo
+                size, label = self.get_label("video")
+                self.ctk_img = ctk.CTkImage(light_image=self.photo, size=size)
+                label.configure(image=self.ctk_img)
+                label.image = self.photo
             elif self.frame is not None:
-                width = self.preview_frame.winfo_width()
+                width = self.get_label("video")[1].winfo_width()
                 height = int(width * self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT) / self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
                 # Resize only if dimensions changed
@@ -164,8 +168,9 @@ class VideoApp(ctk.CTk):
 
                 # Reuse CTkImage to reduce memory allocations
                 self.ctk_img = ctk.CTkImage(light_image=img, size=(width, height))
-                self.video_label.configure(image=self.ctk_img)
-                self.video_label.image = self.ctk_img
+                _, label = self.get_label("video")
+                label.configure(image=self.ctk_img)
+                label.image = self.ctk_img
         except:
             pass
         self.after(32, self.update_frame)  # Update every 32ms
@@ -210,11 +215,33 @@ class VideoApp(ctk.CTk):
         if self.ctk_treated_image is None:
             self.button3.configure(state="normal")
         
-        self.ctk_treated_image = ctk.CTkImage(light_image=Image.fromarray(image), size=(320,180))
+        size, label = self.get_label("treated")
+        self.ctk_treated_image = ctk.CTkImage(light_image=Image.fromarray(image), size=size)
 
-        self.treated_label.configure(image = self.ctk_treated_image)
-        self.treated_label.image = self.ctk_treated_image
+        label.configure(image = self.ctk_treated_image)
+        label.image = self.ctk_treated_image
+        
+    def get_label(self, name: str) -> tuple[tuple[int, int], ctk.CTkLabel]:
+        """ return the label to display an image """
+        
+        treated = ((320,180), self.treated_label)
+        video = ((640, 480), self.video_label)
+        
+        if self.image_label_inversed:
+            treated, video = video, treated
             
+        if name == "treated":
+            return treated
+        elif name == "video":
+            return video
+            
+    def inverse_screens(self, event):
+        """ inverse the video and the treated image """
+        
+        self.image_label_inversed = not self.image_label_inversed
+        self.update_preview_image()
+        
+        
 
 
     def on_window_resize(self, event):
