@@ -11,9 +11,9 @@ def test(trajectoire):
     con = Control()
     con.sendCoordonates(trajectoire)
 
-def main(allProgram = False):
-    image = cv2.imread("pika.jpg", cv2.IMREAD_GRAYSCALE)
-    trajectoire = calcul_trajectoire(image)
+def main(filename: str, allProgram = False):
+    image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+    trajectoire = calcul_trajectoire(image,pointRatio=1)
     
     setp1 = [0.250, 0.100, 0.040, 0, 0, 0]
     setp2 = [0.350, 0.100, 0.040, 0, 0, 0]
@@ -44,6 +44,7 @@ def main(allProgram = False):
     
     
 if __name__ == "__main__":
-    main(True)
+    filename = "binary.png"
+    main(filename,True)
     
 

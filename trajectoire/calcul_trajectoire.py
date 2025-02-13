@@ -99,9 +99,9 @@ def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = Fa
 
 if __name__ == "__main__":
     # Load the image
-    image_path = 'image/chat.png'
+    image_path = 'binary.png'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = calcul_trajectoire(image, 50, "bluredcanny", show=True)
+    traj = calcul_trajectoire(image, 5, "bluredcanny", show=True)
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     print(traj)
