@@ -7,7 +7,7 @@ import customtkinter as ctk
 import numpy as np
 from PIL import Image, ImageDraw
 from cameras import get_cameras
-from linedraw.linedraw import sketch
+from linedraw.linedraw import sketch, visualize
 import cProfile, pstats
 
 class VideoApp(ctk.CTk):
@@ -88,11 +88,7 @@ class VideoApp(ctk.CTk):
             self.photo = Image.fromarray(self.frame)    
             if self.dropdown_type.get() == "linedraw":
                 lines = sketch(self.photo)
-                disp = Image.new("RGB",(1280,720),(255,255,255))
-                draw = ImageDraw.Draw(disp)
-                for l in lines:
-                    draw.line(l,(0,0,0),5)
-                disp.show()
+                visualize(lines)
         self.display_photo = True
         return
 
