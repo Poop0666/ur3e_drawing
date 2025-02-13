@@ -6,7 +6,16 @@ try:
 except:
     from trajMaker import getTraj
 
-def calcul_trajectoire(image, pointRatio = 10, method = "bluredcanny", show = False, preview = False):            
+def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcanny", show = False, preview = False): 
+    
+    # Put the image in greyscale if it's not the case
+    if image.shape[2] != 1:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        
+    if type(pointRatio) is not int:
+        pointRatio = int(pointRatio)
+    
+             
     # Preprocess the image (edge detection or thresholding)
     canny = cv2.Canny(image, 50, 150)  # Use Canny edge detection
     

@@ -5,8 +5,10 @@ import threading
 import customtkinter as ctk
 from PIL import Image
 from cameras import get_cameras
-from linedraw.linedraw import sketch, visualize
+import linedraw.linedraw as linedraw
 import cProfile, pstats
+import trajectoire.calcul_trajectoire as ct
+from numpy import ndarray
 
 class VideoApp(ctk.CTk):
     def __init__(self):
@@ -33,6 +35,7 @@ class VideoApp(ctk.CTk):
         self.controls_frame = ctk.CTkFrame(self)
         self.controls_frame.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
         self.controls_frame.grid_columnconfigure(0, weight=1)
+        
 
         self.cameras_label = ctk.CTkLabel(self.controls_frame, text="Select camera source")
         self.cameras_label.grid(column=0, padx=20, pady=5, sticky="new")
@@ -53,15 +56,25 @@ class VideoApp(ctk.CTk):
         self.checkbox_hatch_linedraw = ctk.CTkCheckBox(self.controls_frame, text="Hatch linedraw", variable=ctk.BooleanVar(value=True))
         self.checkbox_hatch_linedraw.grid(column=0, pady=5, sticky="ew")
         #self.checkbox_hatch_linedraw.grid_remove()
+        
+        self.slider_label = ctk.CTkLabel(self.controls_frame, text="Select the simplification of the processing")
+        self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
+        
+        self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=50, command=self.update_slider)
+        self.slider.grid(column=0, pady=5, sticky="ew")
+        
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 25")
+        self.value_slider_label.grid(column=0, padx=20, sticky="ew")
 
         self.button2 = ctk.CTkButton(self.controls_frame, text="Take a photo", command=self.take_photo)
-        self.button2.grid(column=0, pady=5, sticky="ew")
+        self.button2.grid(column=0, pady=20, sticky="ew")
+        
+        self.treated_label = ctk.CTkLabel(self.controls_frame, text="")
+        self.treated_label.grid(column=0, sticky="ew")
 
-        self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing)
+        self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing, state="disabled")
         self.button3.grid(column=0, pady=5, sticky="ew")
 
-        self.contour_label = ctk.CTkLabel(self.controls_frame, text="AA", font=('Arial', 50))
-        self.contour_label.grid(column=0, padx=20, pady=10, sticky="ew")
 
         # Video Capture
         self.refresh_cameras()
@@ -69,14 +82,23 @@ class VideoApp(ctk.CTk):
         self.running = True
         self.frame = None  # Store the last frame to avoid redundant resizing
         self.video_thread = threading.Thread(target=self.capture_video, daemon=True) # Start video capture thread
+        self.video_thread.deamon = True
         self.video_thread.start()
 
-        self.update_thread = threading.Thread(self.update_frame(), daemon=True)
+        self.update_thread = threading.Thread(target=self.update_frame, daemon=True)
+        self.update_thread.deamon = True
         self.update_thread.start()
 
         self.display_photo = False
         self.photo = None
         self.bind("<Configure>", self.on_window_resize)
+        
+        self.frame_4_preview = None
+        self.ctk_treated_image = None
+        
+        # Needed for the slider's callback
+        self.timer = None
+        self.lock = threading.Lock()
 
     def start_drawing(self):
         if self.photo is not None:
@@ -85,11 +107,8 @@ class VideoApp(ctk.CTk):
     
     def take_photo(self):
         if self.frame is not None:
-            self.photo = Image.fromarray(self.frame)    
-            if self.dropdown_type.get() == "linedraw":
-                lines = sketch(self.photo)
-                visualize(lines)
-        self.display_photo = True
+            self.frame_4_preview = self.frame
+            self.update_preview_image()
         return
 
     def refresh_cameras(self):
@@ -150,6 +169,53 @@ class VideoApp(ctk.CTk):
         except:
             pass
         self.after(32, self.update_frame)  # Update every 32ms
+        
+        
+    def update_slider(self, value):
+        """ callback of the slider, update the priview if the slider is untouched during 0.7 second """
+        
+        self.value_slider_label.configure(text=f"Actual value : {int(value)}")
+        
+        with self.lock:
+            # cancel the old timer if one is running
+            if self.timer is not None:
+                self.timer.cancel()
+                
+            # start the timer
+            self.timer = threading.Timer(0.7, self.update_preview_image)
+            self.timer.start()
+    
+        
+    def update_preview_image(self):
+        """ update the frame of the preview """
+        
+        # check if a preview already exist
+        if self.frame_4_preview is None:
+            return
+        
+        # check if the method is 'linedrawn' because it's not using the same librairy
+        if self.dropdown_type.get() == "linedraw":
+            photo = Image.fromarray(self.frame_4_preview)
+            treated_image = linedraw.get_preview(photo)
+            
+        else:
+            treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
+            
+        self.show_preview_image(treated_image)
+        
+        
+    def show_preview_image(self, image : ndarray):
+        """ show the treated image in the preview box """
+        
+        if self.ctk_treated_image is None:
+            self.button3.configure(state="normal")
+        
+        self.ctk_treated_image = ctk.CTkImage(light_image=Image.fromarray(image), size=(320,180))
+
+        self.treated_label.configure(image = self.ctk_treated_image)
+        self.treated_label.image = self.ctk_treated_image
+            
+
 
     def on_window_resize(self, event):
         """ Adjust grid column sizes on window resize. """
@@ -169,16 +235,26 @@ class VideoApp(ctk.CTk):
 
     def on_processing_type_change(self, choice):
         """ Hide or show the checkbox based on the selected processing type. """
+        
         if choice == "linedraw":
             self.checkbox_hatch_linedraw.grid()
+            self.slider.configure(state="disabled")
         else:
+            self.slider.configure(state="normal")
             self.checkbox_hatch_linedraw.grid_remove()
+            
+        self.update_preview_image()
+        
+    def start_drawing(self):
+        raise NotImplementedError("Faut relier le connecteur içi")
 
 
 def main():
     app = VideoApp()
     app.protocol("WM_DELETE_WINDOW", app.on_closing)
     app.mainloop()
+    
+    del app
 
 if __name__ == "__main__":
     #profiler = cProfile.Profile()

@@ -1,10 +1,25 @@
 # Based on https://github.com/LingDong-/linedraw.git
 from PIL import Image, ImageOps
 import linedraw.perlin as perlin
-from numpy import array
+from numpy import array, ndarray, frombuffer, uint8
 from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
 
+def get_preview(image: Image) -> ndarray:
+    lines = sketch(image)
+    plt.figure()
+    for line in lines:
+        x, y = zip(*line)
+        plt.plot(x, y, color="black")
+    plt.gca().invert_yaxis()
+    plt.axis("off")
+    
+    canvas = plt.gca().figure.canvas
+    canvas.draw()
+    data = frombuffer(canvas.tostring_rgb(), dtype=uint8)
+    previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
+    return previsualisation
+    
 
 def distsum(*args: tuple) -> float:
     return sum(
