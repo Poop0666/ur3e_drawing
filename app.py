@@ -2,10 +2,8 @@ import os
 os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
 import cv2
 import threading
-from tooltip import Tooltip
 import customtkinter as ctk
-import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 from cameras import get_cameras
 from linedraw.linedraw import sketch, visualize
 import cProfile, pstats
@@ -36,9 +34,8 @@ class VideoApp(ctk.CTk):
         self.controls_frame.grid(row=0, column=1, padx=20, pady=10, sticky="nsew")
         self.controls_frame.grid_columnconfigure(0, weight=1)
 
-        self.cameras_label = ctk.CTkLabel(self.controls_frame, text="Select camera (hover for more info)")
+        self.cameras_label = ctk.CTkLabel(self.controls_frame, text="Select camera source")
         self.cameras_label.grid(column=0, padx=20, pady=5, sticky="new")
-        Tooltip(self.cameras_label, "This is an information tooltip!") # Attach tooltip to the button
         
         self.dropdown_cameras = ctk.CTkComboBox(self.controls_frame, values=[], command=self.select_cam, state="readonly")
         self.dropdown_cameras.grid(column=0, pady=5, sticky="ew")
@@ -49,9 +46,13 @@ class VideoApp(ctk.CTk):
         self.processing_label = ctk.CTkLabel(self.controls_frame, text="Select the type of image processing")
         self.processing_label.grid(column=0, padx=20, pady=5, sticky="ew")
 
-        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly")
+        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly", command=self.on_processing_type_change)
         self.dropdown_type.grid(column=0, pady=5, sticky="ew")
         self.dropdown_type.set("bluredcanny")
+
+        self.checkbox_hatch_linedraw = ctk.CTkCheckBox(self.controls_frame, text="Hatch linedraw", variable=ctk.BooleanVar(value=True))
+        self.checkbox_hatch_linedraw.grid(column=0, pady=5, sticky="ew")
+        #self.checkbox_hatch_linedraw.grid_remove()
 
         self.button2 = ctk.CTkButton(self.controls_frame, text="Take a photo", command=self.take_photo)
         self.button2.grid(column=0, pady=5, sticky="ew")
@@ -80,7 +81,6 @@ class VideoApp(ctk.CTk):
     def start_drawing(self):
         if self.photo is not None:
             print(self.photo)
-            print(self.dropdown_type.get())
         return
     
     def take_photo(self):
@@ -128,7 +128,8 @@ class VideoApp(ctk.CTk):
         """ Update the UI with the latest frame. """
         try:
             if self.display_photo:
-                self.video_label.configure(image=self.photo)
+                self.ctk_img = ctk.CTkImage(light_image=self.photo, size=(width, height))
+                self.video_label.configure(image=self.ctk_img)
                 self.video_label.image = self.photo
             elif self.frame is not None:
                 width = self.preview_frame.winfo_width()
@@ -166,6 +167,12 @@ class VideoApp(ctk.CTk):
             self.cap.release()
         self.destroy()
 
+    def on_processing_type_change(self, choice):
+        """ Hide or show the checkbox based on the selected processing type. """
+        if choice == "linedraw":
+            self.checkbox_hatch_linedraw.grid()
+        else:
+            self.checkbox_hatch_linedraw.grid_remove()
 
 
 def main():
