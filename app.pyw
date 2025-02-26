@@ -106,11 +106,6 @@ class VideoApp(ctk.CTk):
         # Needed for the slider's callback
         self.timer = None
         self.lock = threading.Lock()
-
-    def start_drawing(self):
-        if self.photo is not None:
-            print(self.photo)
-        return
     
     def take_photo(self):
         if self.frame is not None:
@@ -205,11 +200,11 @@ class VideoApp(ctk.CTk):
         # check if the method is 'linedrawn' because it's not using the same librairy
         if self.dropdown_type.get() == "linedraw":
             photo = Image.fromarray(self.frame_4_preview)
-            treated_image = linedraw.get_preview(photo)
+            self.points, nb_points, treated_image = linedraw.output(photo, True)
             
         else:
             self.points, nb_points, treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
-            self.points_label.configure(text=f"There are {nb_points} points")
+        self.points_label.configure(text=f"There are {nb_points} points")
         self.show_preview_image(treated_image)
         
         
