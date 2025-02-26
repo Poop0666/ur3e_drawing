@@ -73,6 +73,9 @@ class VideoApp(ctk.CTk):
         self.treated_label.grid(column=0, sticky="ew")
         self.treated_label.bind("<Button-1>", self.inverse_screens)
 
+        self.points_label = ctk.CTkLabel(self.controls_frame, text="There is 0 point")
+        self.points_label.grid(column=0, sticky="ew")
+
         self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing, state="disabled")
         self.button3.grid(column=0, pady=5, sticky="ew")
 
@@ -205,7 +208,7 @@ class VideoApp(ctk.CTk):
             
         else:
             nb_points, treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
-            
+            self.points_label.configure(text=f"There are {nb_points} points")
         self.show_preview_image(treated_image)
         
         
