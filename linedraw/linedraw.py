@@ -1,6 +1,6 @@
 """
 This script is based on the Linedraw project from https://github.com/LingDong-/linedraw.git.
-It provides functions to convert images into line drawings using various techniques.
+It provides functions to convert images into line drawings.
 """
 
 from PIL import Image, ImageOps
@@ -8,30 +8,8 @@ import linedraw.perlin as perlin
 from numpy import array, ndarray, frombuffer, uint8
 from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
+from trajectoire.trajMaker import getTraj
 
-def get_preview(image: Image) -> ndarray:
-    """
-    Generate a preview of the line drawing from an image.
-
-    Args:
-        image (Image): The input image to be converted into a line drawing.
-
-    Returns:
-        ndarray: A numpy array representing the preview of the line drawing.
-    """
-    lines = sketch(image)
-    plt.figure()
-    for line in lines:
-        x, y = zip(*line)
-        plt.plot(x, y, color="black")
-    plt.gca().invert_yaxis()
-    plt.axis("off")
-
-    canvas = plt.gca().figure.canvas
-    canvas.draw()
-    data = frombuffer(canvas.tostring_rgb(), dtype=uint8)
-    previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
-    return previsualisation
 
 def distsum(*args: tuple) -> float:
     """
@@ -51,6 +29,7 @@ def distsum(*args: tuple) -> float:
         ]
     )
 
+
 def visualize(lines: list) -> None:
     """
     Visualize the lines generated from an image.
@@ -64,6 +43,7 @@ def visualize(lines: list) -> None:
         plt.plot(x, y, color="black")
     plt.gca().invert_yaxis()
     plt.show()
+
 
 def sortlines(lines: list, verbose: bool = False) -> list:
     """
@@ -96,6 +76,7 @@ def sortlines(lines: list, verbose: bool = False) -> list:
         slines.append(x)
     return slines
 
+
 def find_edges(IM: Image, verbose: bool = False) -> Image:
     """
     Detect edges in an image using Gaussian blur and Canny edge detection.
@@ -114,6 +95,7 @@ def find_edges(IM: Image, verbose: bool = False) -> Image:
     im = Canny(im, 100, 200)
     IM = Image.fromarray(im)
     return IM.point(lambda p: p > 128 and 255)
+
 
 def getdots(IM: Image, verbose: bool = False) -> list:
     """
@@ -144,6 +126,7 @@ def getdots(IM: Image, verbose: bool = False) -> list:
                     row.append((x, 0))
         dots.append(row)
     return dots
+
 
 def connectdots(dots: list, verbose: bool = False) -> list:
     """
@@ -193,6 +176,7 @@ def connectdots(dots: list, verbose: bool = False) -> list:
                 contours.remove(c)
     return contours
 
+
 def getcontours(IM: Image, sc: int = 2, verbose: bool = False) -> list:
     """
     Generate contours from an image.
@@ -241,6 +225,7 @@ def getcontours(IM: Image, sc: int = 2, verbose: bool = False) -> list:
             ), int(contours[i][j][1] + 10 * perlin.noise(i * 0.5, j * 0.1, 2))
 
     return contours
+
 
 def hatch(IM: Image, sc=16, verbose=False) -> list:
     """
@@ -297,6 +282,7 @@ def hatch(IM: Image, sc=16, verbose=False) -> list:
             )
     return lines
 
+
 def sketch(
     IM: Image,
     verbose: bool = False,
@@ -349,3 +335,38 @@ def sketch(
         print(len(lines), "strokes.")
         print("done.")
     return lines
+
+
+def output(IM: Image, preview: bool = False):
+    """
+    Generate and optionally preview the output trajectory and number of points from an image.
+
+    Args:
+        IM (Image): The input image to be processed.
+        preview (bool): If True, generate a preview of the line drawing.
+
+    Returns:
+        tuple: A tuple containing:
+            - trajectory (str): The trajectory of the lines in the image.
+            - nb_points (int): The total number of points in the lines.
+            - previsualisation (ndarray, optional): A numpy array representing the preview of the line drawing,
+              only returned if preview is True.
+    """
+    lines = sketch(IM)
+    nb_points = sum([len(line) for line in lines])
+    trajectory = getTraj(lines, IM.size[1], IM.size[0])
+    print(trajectory)
+    if preview:
+        plt.figure()
+        for line in lines:
+            x, y = zip(*line)
+            plt.plot(x, y, color="black")
+        plt.gca().invert_yaxis()
+        plt.axis("off")
+
+        canvas = plt.gca().figure.canvas
+        canvas.draw()
+        data = frombuffer(canvas.tostring_rgb(), dtype=uint8)
+        previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
+        return trajectory, nb_points, previsualisation
+    return trajectory, nb_points
