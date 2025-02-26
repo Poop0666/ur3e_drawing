@@ -86,12 +86,12 @@ class VideoApp(ctk.CTk):
             
         self.running = True
         self.frame = None  # Store the last frame to avoid redundant resizing
-        self.video_thread = threading.Thread(target=self.capture_video, daemon=True) # Start video capture thread
-        self.video_thread.deamon = True
+        self.video_thread = threading.Thread(target=self.capture_video) # Start video capture thread
+        self.video_thread.daemon = True
         self.video_thread.start()
 
-        self.update_thread = threading.Thread(target=self.update_frame, daemon=True)
-        self.update_thread.deamon = True
+        self.update_thread = threading.Thread(target=self.update_frame)
+        self.update_thread.daemon = True
         self.update_thread.start()
 
         self.display_photo = False

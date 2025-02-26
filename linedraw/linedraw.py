@@ -1,4 +1,8 @@
-# Based on https://github.com/LingDong-/linedraw.git
+"""
+This script is based on the Linedraw project from https://github.com/LingDong-/linedraw.git.
+It provides functions to convert images into line drawings using various techniques.
+"""
+
 from PIL import Image, ImageOps
 import linedraw.perlin as perlin
 from numpy import array, ndarray, frombuffer, uint8
@@ -6,6 +10,15 @@ from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
 
 def get_preview(image: Image) -> ndarray:
+    """
+    Generate a preview of the line drawing from an image.
+
+    Args:
+        image (Image): The input image to be converted into a line drawing.
+
+    Returns:
+        ndarray: A numpy array representing the preview of the line drawing.
+    """
     lines = sketch(image)
     plt.figure()
     for line in lines:
@@ -13,15 +26,23 @@ def get_preview(image: Image) -> ndarray:
         plt.plot(x, y, color="black")
     plt.gca().invert_yaxis()
     plt.axis("off")
-    
+
     canvas = plt.gca().figure.canvas
     canvas.draw()
     data = frombuffer(canvas.tostring_rgb(), dtype=uint8)
     previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
     return previsualisation
-    
 
 def distsum(*args: tuple) -> float:
+    """
+    Calculate the sum of distances between consecutive points.
+
+    Args:
+        *args (tuple): A variable number of tuples, each containing two coordinates.
+
+    Returns:
+        float: The sum of the distances between consecutive points.
+    """
     return sum(
         [
             ((args[i][0] - args[i - 1][0]) ** 2 + (args[i][1] - args[i - 1][1]) ** 2)
@@ -30,8 +51,13 @@ def distsum(*args: tuple) -> float:
         ]
     )
 
-
 def visualize(lines: list) -> None:
+    """
+    Visualize the lines generated from an image.
+
+    Args:
+        lines (list): A list of lines, where each line is a list of (x, y) coordinates.
+    """
     plt.figure()
     for line in lines:
         x, y = zip(*line)
@@ -39,8 +65,17 @@ def visualize(lines: list) -> None:
     plt.gca().invert_yaxis()
     plt.show()
 
-
 def sortlines(lines: list, verbose: bool = False) -> list:
+    """
+    Sort lines to optimize the drawing sequence.
+
+    Args:
+        lines (list): A list of lines, where each line is a list of (x, y) coordinates.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        list: A sorted list of lines.
+    """
     if verbose:
         print("optimizing stroke sequence...")
     clines = lines[:]
@@ -61,8 +96,17 @@ def sortlines(lines: list, verbose: bool = False) -> list:
         slines.append(x)
     return slines
 
-
 def find_edges(IM: Image, verbose: bool = False) -> Image:
+    """
+    Detect edges in an image using Gaussian blur and Canny edge detection.
+
+    Args:
+        IM (Image): The input image.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        Image: An image with detected edges.
+    """
     if verbose:
         print("finding edges...")
     im = array(IM)
@@ -71,8 +115,17 @@ def find_edges(IM: Image, verbose: bool = False) -> Image:
     IM = Image.fromarray(im)
     return IM.point(lambda p: p > 128 and 255)
 
-
 def getdots(IM: Image, verbose: bool = False) -> list:
+    """
+    Extract contour points from an image.
+
+    Args:
+        IM (Image): The input image.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        list: A list of contour points.
+    """
     if verbose:
         print("getting contour points...")
     PX = IM.load()
@@ -92,8 +145,17 @@ def getdots(IM: Image, verbose: bool = False) -> list:
         dots.append(row)
     return dots
 
-
 def connectdots(dots: list, verbose: bool = False) -> list:
+    """
+    Connect contour points to form contours.
+
+    Args:
+        dots (list): A list of contour points.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        list: A list of connected contours.
+    """
     if verbose:
         print("connecting contour points...")
     contours = []
@@ -131,8 +193,18 @@ def connectdots(dots: list, verbose: bool = False) -> list:
                 contours.remove(c)
     return contours
 
-
 def getcontours(IM: Image, sc: int = 2, verbose: bool = False) -> list:
+    """
+    Generate contours from an image.
+
+    Args:
+        IM (Image): The input image.
+        sc (int): Scale factor for the contours.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        list: A list of contours.
+    """
     if verbose:
         print("generating contours...")
     IM = find_edges(IM)
@@ -170,8 +242,18 @@ def getcontours(IM: Image, sc: int = 2, verbose: bool = False) -> list:
 
     return contours
 
-
 def hatch(IM: Image, sc=16, verbose=False) -> list:
+    """
+    Generate hatching lines for an image.
+
+    Args:
+        IM (Image): The input image.
+        sc (int): Scale factor for the hatching lines.
+        verbose (bool): If True, print progress messages.
+
+    Returns:
+        list: A list of hatching lines.
+    """
     if verbose:
         print("hatching...")
     PX = IM.load()
@@ -215,7 +297,6 @@ def hatch(IM: Image, sc=16, verbose=False) -> list:
             )
     return lines
 
-
 def sketch(
     IM: Image,
     verbose: bool = False,
@@ -225,7 +306,21 @@ def sketch(
     hatch_size: int = 16,
     contour_simplify: int = 2,
 ) -> list:
+    """
+    Generate a sketch from an image by combining contours and hatching.
 
+    Args:
+        IM (Image): The input image.
+        verbose (bool): If True, print progress messages.
+        draw_contours (bool): If True, draw contours.
+        draw_hatch (bool): If True, draw hatching lines.
+        resolution (int): Resolution of the output sketch.
+        hatch_size (int): Size of the hatching lines.
+        contour_simplify (int): Simplification factor for contours.
+
+    Returns:
+        list: A list of lines representing the sketch.
+    """
     w, h = IM.size
 
     IM = IM.convert("L")
