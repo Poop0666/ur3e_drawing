@@ -101,7 +101,9 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         canvas.draw()
         data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
         previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
-        return previsualisation
+        
+        nbPoints = getTraj(all_trajectories, height, width)
+        return nbPoints, previsualisation
         
 
     return getTraj(all_trajectories, height, width)

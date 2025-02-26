@@ -35,8 +35,14 @@ class Control():
 
             if state is None:
                 break
+            
+            if index >= len(coordonates):
+                keep_running = False
+                startPoint = [0.340, 0, 0.07, 0, 0, 0]
+                monitor.sendall("setp", startPoint)
+                continue
 
-            print(f"{state.output_int_register_0=}")
+            #print(f"{state.output_int_register_0=}")
             # do something...
             if state.output_int_register_0 != 0 and ready2Next:
                 ready2Next = False

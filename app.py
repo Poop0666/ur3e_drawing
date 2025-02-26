@@ -204,7 +204,7 @@ class VideoApp(ctk.CTk):
             treated_image = linedraw.get_preview(photo)
             
         else:
-            treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
+            nb_points, treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
             
         self.show_preview_image(treated_image)
         
