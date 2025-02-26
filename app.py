@@ -204,7 +204,7 @@ class VideoApp(ctk.CTk):
         # check if the method is 'linedrawn' because it's not using the same librairy
         if self.dropdown_type.get() == "linedraw":
             photo = Image.fromarray(self.frame_4_preview)
-            treated_image = linedraw.get_preview(photo)
+            lines, treated_image = linedraw.output(photo, True)
             
         else:
             nb_points, treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
