@@ -8,7 +8,7 @@ def getTraj(contours: list[list[tuple[int]]], height: int, width: int) -> list[t
     offsetX = 0.350
     offsetY = 0
     #z_b = 55.9 / 1000
-    z_b = 59/1000
+    z_b = 58.5/1000
     z_h = 70 / 1000
     traj = [[0.344, -0.144, 0.07, 0, 0, 0]]
     x_angle = 0.0

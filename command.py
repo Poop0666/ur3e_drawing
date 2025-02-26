@@ -34,8 +34,8 @@ def startDrawing(points: list):
     
     
 if __name__ == "__main__":
-    image = cv2.imread("image/amongus.jpg")
-    points = calcul_trajectoire(image,1)
+    image = cv2.imread("image/stick.jpg")
+    points = calcul_trajectoire(image,5)
     startDrawing(points)
     
 

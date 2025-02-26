@@ -49,7 +49,7 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         chosen = canny
 
     # Find contours
-    contours, _ = cv2.findContours(chosen, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(chosen, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
 
     # Calculate the center of the image
     height, width = chosen.shape
@@ -88,25 +88,23 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         plt.axis('equal')
         plt.show()
         
-    if preview:
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=(8, 8))
-        for trajectory in all_trajectories:
-            trajectory = np.array(trajectory)
-            plt.plot(trajectory[:, 0], trajectory[:, 1], linewidth=1)
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(8, 8))
+    for trajectory in all_trajectories:
+        trajectory = np.array(trajectory)
+        plt.plot(trajectory[:, 0], trajectory[:, 1], linewidth=1)
 
-        plt.axis("off")
+    plt.axis("off")
+
+    canvas = plt.gca().figure.canvas
+    canvas.draw()
+    data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
+    previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
     
-        canvas = plt.gca().figure.canvas
-        canvas.draw()
-        data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
-        previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
-        
-        nbPoints = len(getTraj(all_trajectories, height, width))
-        return nbPoints, previsualisation
-        
+    points = getTraj(all_trajectories, height, width)
+    nbPoints = len(points)
+    return points, nbPoints, previsualisation
 
-    return getTraj(all_trajectories, height, width)
 
 if __name__ == "__main__":
     # Load the image
