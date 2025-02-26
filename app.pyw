@@ -112,11 +112,6 @@ class VideoApp(ctk.CTk):
         # Needed for the slider's callback
         self.timer = None
         self.lock = threading.Lock()
-
-    def start_drawing(self):
-        if self.photo is not None:
-            print(self.photo)
-        return
     
     def take_photo(self):
         if self.frame is not None:
