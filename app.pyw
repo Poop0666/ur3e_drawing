@@ -9,6 +9,7 @@ import linedraw.linedraw as linedraw
 import cProfile, pstats
 import command
 import trajectoire.calcul_trajectoire as ct
+import resizer
 from numpy import ndarray
 
 class VideoApp(ctk.CTk):
@@ -66,6 +67,10 @@ class VideoApp(ctk.CTk):
         
         self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 25")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
+        
+        self.varCheckResize = ctk.BooleanVar(value=True)
+        self.checkbox_resize_A4 = ctk.CTkCheckBox(self.controls_frame, text="Resize to a A4 format", variable=self.varCheckResize)
+        self.checkbox_resize_A4.grid(column=0, sticky="ew")
 
         self.button2 = ctk.CTkButton(self.controls_frame, text="Take a photo", command=self.take_photo)
         self.button2.grid(column=0, pady=20, sticky="ew")
@@ -101,6 +106,7 @@ class VideoApp(ctk.CTk):
         
         self.frame_4_preview = None
         self.ctk_treated_image = None
+        self.treated_image = None
 
         
         # Needed for the slider's callback
@@ -202,15 +208,22 @@ class VideoApp(ctk.CTk):
         if self.frame_4_preview is None:
             return
         
+        image_resized = None
+        if self.varCheckResize.get():
+            image_resized = resizer.binaryResizeA4(self.frame_4_preview)
+        
+        image_4_treatement = image_resized if image_resized is not None else self.frame_4_preview
+            
         # check if the method is 'linedrawn' because it's not using the same librairy
         if self.dropdown_type.get() == "linedraw":
-            photo = Image.fromarray(self.frame_4_preview)
-            treated_image = linedraw.get_preview(photo)
+            photo = Image.fromarray(image_4_treatement)
+            self.points, nb_points, self.treated_image = linedraw.output(photo, preview=True)
             
         else:
-            self.points, nb_points, treated_image = ct.calcul_trajectoire(self.frame_4_preview, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
-            self.points_label.configure(text=f"There are {nb_points} points")
-        self.show_preview_image(treated_image)
+            self.points, nb_points, self.treated_image = ct.calcul_trajectoire(image_4_treatement, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
+        
+        self.points_label.configure(text=f"There are {nb_points} points")
+        self.show_preview_image(self.treated_image)
         
         
     def show_preview_image(self, image : ndarray):
@@ -243,7 +256,7 @@ class VideoApp(ctk.CTk):
         """ inverse the video and the treated image """
         
         self.image_label_inversed = not self.image_label_inversed
-        self.update_preview_image()
+        self.show_preview_image(self.treated_image)
         
         
 

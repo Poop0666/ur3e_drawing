@@ -355,7 +355,6 @@ def output(IM: Image, preview: bool = False):
     lines = sketch(IM)
     nb_points = sum([len(line) for line in lines])
     trajectory = getTraj(lines, IM.size[1], IM.size[0])
-    print(trajectory)
     if preview:
         plt.figure()
         for line in lines:

@@ -9,8 +9,23 @@ except:
 def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcanny", show = False, preview = False): 
     
     # Put the image in greyscale if it's not the case
-    if image.shape[2] != 1:
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    print(type(image))
+    print(image.shape)
+    try:
+        if len(image.shape) == 2:
+            cv2.imwrite("binary.png",image)
+            image = cv2.imread("binary.png", cv2.IMREAD_GRAYSCALE)
+        
+        elif image.shape[2] != 1:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            print(image.shape)
+            print(image[0])
+            print(type(image))
+    except ValueError as e:
+        print(e)
+        print(image.shape)
+        cv2.imshow("Error Image",image)
+        cv2.waitKey()
         
     if type(pointRatio) is not int:
         pointRatio = int(pointRatio)
@@ -110,7 +125,7 @@ if __name__ == "__main__":
     # Load the image
     image_path = 'binary.png'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = calcul_trajectoire(image, 5, "bluredcanny", show=True)
+    traj = calcul_trajectoire(image, 5)
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     print(traj)
