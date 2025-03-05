@@ -2,10 +2,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 try:
-    from trajectoire.trajMaker import getTraj
-except:
-    from trajMaker import getTraj
-try:
     from trajectoire.A4_calibration import fit_to_a4
 except:
     from A4_calibration import fit_to_a4
