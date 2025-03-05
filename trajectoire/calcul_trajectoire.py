@@ -5,6 +5,7 @@ try:
     from trajectoire.trajMaker import getTraj
 except:
     from trajMaker import getTraj
+from A4_calibration import fit_to_a4
 
 def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcanny", show = False, preview = False): 
     
@@ -121,7 +122,7 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
     previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
     
     #print(f"Nombre de contours : {len(all_trajectories)}")
-    points = getTraj(all_trajectories, height, width)
+    points = fit_to_a4(all_trajectories) #getTraj(all_trajectories, height, width)
     nbPoints = len(points)
     nbContours = len(all_trajectories)
     return points, nbPoints, nbContours, previsualisation
