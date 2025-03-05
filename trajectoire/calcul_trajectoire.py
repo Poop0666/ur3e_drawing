@@ -63,6 +63,10 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         chosen = sobel
     else:
         chosen = canny
+        
+    r = 5
+    kernel = np.ones((r,r),np.uint8)
+    chosen = cv2.morphologyEx(chosen, cv2.MORPH_CLOSE, kernel)
 
     # Find contours
     contours, _ = cv2.findContours(chosen, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE)
@@ -117,16 +121,18 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
     data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
     previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
     
+    #print(f"Nombre de contours : {len(all_trajectories)}")
     points = fit_to_a4(all_trajectories) #getTraj(all_trajectories, height, width)
     nbPoints = len(points)
-    return points, nbPoints, previsualisation
+    nbContours = len(all_trajectories)
+    return points, nbPoints, nbContours, previsualisation
 
 
 if __name__ == "__main__":
     # Load the image
-    image_path = 'binary.png'
+    image_path = 'image/amongus.jpg'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     traj = calcul_trajectoire(image, 5)
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
-    print(traj)
+    #print(traj)
