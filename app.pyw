@@ -170,11 +170,11 @@ class VideoApp(ctk.CTk):
                 else:
                     frame_resized = cv2.resize(self.frame, (640, 480), interpolation=cv2.INTER_NEAREST)
 
-                img = Image.fromarray(frame_resized)
+                size, label = self.get_label("video")
+                img = Image.fromarray(frame_resized).resize(size)
 
                 # Reuse CTkImage to reduce memory allocations
-                self.ctk_img = ctk.CTkImage(light_image=img, size=(width, height))
-                _, label = self.get_label("video")
+                self.ctk_img = ctk.CTkImage(light_image=img, size=size)
                 label.configure(image=self.ctk_img)
                 label.image = self.ctk_img
         except:
@@ -212,7 +212,8 @@ class VideoApp(ctk.CTk):
             
         # check if the method is 'linedrawn' because it's not using the same librairy
         if self.dropdown_type.get() == "linedraw":
-            photo = Image.fromarray(image_4_treatement)
+            size, _ = self.get_label("treated")
+            photo = Image.fromarray(image_4_treatement).resize(size)
             self.points, nb_points, self.treated_image = linedraw.output(photo, preview=True)
             nb_contours = 0
             
@@ -230,7 +231,7 @@ class VideoApp(ctk.CTk):
             self.button3.configure(state="normal")
         
         size, label = self.get_label("treated")
-        self.ctk_treated_image = ctk.CTkImage(light_image=Image.fromarray(image), size=size)
+        self.ctk_treated_image = ctk.CTkImage(light_image=Image.fromarray(image).resize(size), size=size)
 
         label.configure(image = self.ctk_treated_image)
         label.image = self.ctk_treated_image
@@ -238,8 +239,8 @@ class VideoApp(ctk.CTk):
     def get_label(self, name: str) -> tuple[tuple[int, int], ctk.CTkLabel]:
         """ return the label to display an image """
         
-        treated = ((320,180), self.treated_label)
-        video = ((640, 480), self.video_label)
+        treated = ((256,144), self.treated_label)
+        video = ((720,480), self.video_label)
         
         if self.image_label_inversed:
             treated, video = video, treated
