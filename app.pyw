@@ -63,12 +63,13 @@ class VideoApp(ctk.CTk):
         self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
         
         self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=50, command=self.update_slider)
+        self.slider.set(5)
         self.slider.grid(column=0, pady=5, sticky="ew")
         
-        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 25")
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()}")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
         
-        self.varCheckResize = ctk.BooleanVar(value=True)
+        self.varCheckResize = ctk.BooleanVar(value=False)
         self.checkbox_resize_A4 = ctk.CTkCheckBox(self.controls_frame, text="Resize to a A4 format", variable=self.varCheckResize)
         self.checkbox_resize_A4.grid(column=0, sticky="ew")
 
@@ -213,11 +214,12 @@ class VideoApp(ctk.CTk):
         if self.dropdown_type.get() == "linedraw":
             photo = Image.fromarray(image_4_treatement)
             self.points, nb_points, self.treated_image = linedraw.output(photo, preview=True)
+            nb_contours = 0
             
         else:
-            self.points, nb_points, self.treated_image = ct.calcul_trajectoire(image_4_treatement, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
+            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
         
-        self.points_label.configure(text=f"There are {nb_points} points")
+        self.points_label.configure(text=f"There are {nb_points} points and {nb_contours} contours")
         self.show_preview_image(self.treated_image)
         
         
