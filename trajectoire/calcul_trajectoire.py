@@ -10,8 +10,6 @@ from A4_calibration import fit_to_a4
 def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcanny", show = False, preview = False): 
     
     # Put the image in greyscale if it's not the case
-    print(type(image))
-    print(image.shape)
     try:
         if len(image.shape) == 2:
             cv2.imwrite("binary.png",image)
@@ -115,11 +113,17 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         plt.plot(trajectory[:, 0], trajectory[:, 1], linewidth=1)
 
     plt.axis("off")
+    from io import BytesIO
+    # Save the plot to a bytes buffer
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    # Now buf contains the image data
+    previsualisation = buf.getvalue()
 
-    canvas = plt.gca().figure.canvas
-    canvas.draw()
-    data = np.frombuffer(canvas.tostring_rgb(), dtype=np.uint8)
-    previsualisation = data.reshape(canvas.get_width_height()[::-1] + (3,))
+    # Close the buffer and the plot
+    buf.close()
+    plt.close()
     
     #print(f"Nombre de contours : {len(all_trajectories)}")
     points = fit_to_a4(all_trajectories) #getTraj(all_trajectories, height, width)
@@ -133,6 +137,8 @@ if __name__ == "__main__":
     image_path = 'image/amongus.jpg'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     traj = calcul_trajectoire(image, 5)
+    plt.plot(traj[3])
+    plt.show()
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     #print(traj)
