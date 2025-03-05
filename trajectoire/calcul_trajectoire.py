@@ -5,7 +5,10 @@ try:
     from trajectoire.trajMaker import getTraj
 except:
     from trajMaker import getTraj
-from A4_calibration import fit_to_a4
+try:
+    from trajectoire.A4_calibration import fit_to_a4
+except:
+    from A4_calibration import fit_to_a4
 
 def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcanny", show = False, preview = False): 
     
