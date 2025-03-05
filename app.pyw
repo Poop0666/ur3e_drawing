@@ -64,8 +64,9 @@ class VideoApp(ctk.CTk):
         
         self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=50, command=self.update_slider)
         self.slider.grid(column=0, pady=5, sticky="ew")
+        self.slider.set(1)
         
-        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 25")
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 1")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
         
         self.varCheckResize = ctk.BooleanVar(value=True)
@@ -215,6 +216,7 @@ class VideoApp(ctk.CTk):
             self.points, nb_points, self.treated_image = linedraw.output(photo, preview=True)
             
         else:
+            print(self.slider.get())
             self.points, nb_points, self.treated_image = ct.calcul_trajectoire(image_4_treatement, pointRatio=self.slider.get() ,method=self.dropdown_type.get(), preview=True)
         
         self.points_label.configure(text=f"There are {nb_points} points")
