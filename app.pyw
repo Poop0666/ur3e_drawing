@@ -65,8 +65,9 @@ class VideoApp(ctk.CTk):
         self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=50, command=self.update_slider)
         self.slider.set(5)
         self.slider.grid(column=0, pady=5, sticky="ew")
+        self.slider.set(1)
         
-        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()}")
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 1")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
         
         self.varCheckResize = ctk.BooleanVar(value=False)
