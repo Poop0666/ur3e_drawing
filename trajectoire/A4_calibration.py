@@ -78,6 +78,9 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
             coordinates = [float(translated_points[index+j][0]), float(translated_points[index+j][1]), low_z, 0, 0, 0]
             reshaped_points.append(coordinates)
 
+        coordinates = [float(translated_points[index][0]), float(translated_points[index][1]), low_z, 0, 0, 0]
+        reshaped_points.append(coordinates)
+
         # Lifts the pen
         index += len(points[i]) -1
         coordinates = [float(translated_points[index][0]) ,  float(translated_points[index][1]) , high_z, 0, 0, 0]
