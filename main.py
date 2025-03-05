@@ -13,7 +13,7 @@ def test(trajectoire):
 
 def main(filename: str, allProgram = False):
     image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-    trajectoire = calcul_trajectoire(image,pointRatio=1)
+    trajectoire, _, _, _ = calcul_trajectoire(image,pointRatio=1)
     
     setp1 = [0.250, 0.100, 0.040, 0, 0, 0]
     setp2 = [0.350, 0.100, 0.040, 0, 0, 0]
@@ -35,16 +35,16 @@ def main(filename: str, allProgram = False):
     dash.connect()
     
     #Check to see if robot is in remote mode.
-    remoteCheck = dash.sendAndReceive('is in remote control')
-    if 'false' in remoteCheck:
-        logging.warning('Robot is in local mode. Some commands may not function.')
-    dash.sendAndReceive("play")
-    time.sleep(30)
+    #remoteCheck = dash.sendAndReceive('is in remote control\n')
+    #if 'false' in remoteCheck:
+    #    logging.warning('Robot is in local mode. Some commands may not function.')
+    dash.sendAndReceive("play\n")
+    time.sleep(120)
     dash.close()
     
     
 if __name__ == "__main__":
-    filename = "binary.png"
+    filename = "image/square.png"
     main(filename,True)
     
 

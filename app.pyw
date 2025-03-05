@@ -10,6 +10,7 @@ import cProfile, pstats
 import command
 import trajectoire.calcul_trajectoire as ct
 import resizer
+import pingger
 from numpy import ndarray
 
 class VideoApp(ctk.CTk):
@@ -62,16 +63,15 @@ class VideoApp(ctk.CTk):
         self.slider_label = ctk.CTkLabel(self.controls_frame, text="Select the simplification of the processing")
         self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
         
-        self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=50, command=self.update_slider)
+        self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=30, command=self.update_slider)
         self.slider.set(5)
         self.slider.grid(column=0, pady=5, sticky="ew")
-        self.slider.set(1)
         
-        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text="Actual value : 1")
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()}")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
         
         self.varCheckResize = ctk.BooleanVar(value=False)
-        self.checkbox_resize_A4 = ctk.CTkCheckBox(self.controls_frame, text="Resize to a A4 format", variable=self.varCheckResize)
+        self.checkbox_resize_A4 = ctk.CTkCheckBox(self.controls_frame, text="Extract a A4 format", variable=self.varCheckResize)
         self.checkbox_resize_A4.grid(column=0, sticky="ew")
 
         self.button2 = ctk.CTkButton(self.controls_frame, text="Take a photo", command=self.take_photo)
@@ -289,7 +289,16 @@ class VideoApp(ctk.CTk):
         self.update_preview_image()
         
     def start_drawing(self):
+        self.button3.configure(state="disabled")
+        pingger.check_ping()
+        drawing_thread = threading.Thread(target=self.thread_drawing)
+        drawing_thread.daemon = True
+        drawing_thread.start()
+        
+    def thread_drawing(self):
         command.startDrawing(self.points)
+        self.button3.configure(state="enabled")
+        
 
 
 def main():

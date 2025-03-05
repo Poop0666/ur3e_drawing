@@ -5,8 +5,8 @@ def getTraj(contours: list[list[tuple[int]]], height: int, width: int) -> list[t
     # centre: feuille = (300, 0)
     ratioHeight = (210 / height) * 0.8
     rationWidth = (297 / width) * 0.8
-    offsetX = 0.350
-    offsetY = 0
+    offsetX = 0.10
+    offsetY = -0.210
     #z_b = 55.9 / 1000
     z_b = 58.5/1000
     z_h = 70 / 1000
