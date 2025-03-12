@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import PIL
 try:
-    from trajectoire.A4_calibration import fit_to_a4
+    from ImageProcessing.A4_calibration import fit_to_a4
 except:
     from A4_calibration import fit_to_a4
 

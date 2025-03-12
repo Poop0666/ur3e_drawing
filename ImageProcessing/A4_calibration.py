@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import array as nparray, min as npmin, max as npmax
 
 def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
     """
@@ -13,11 +13,11 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
     - List of lists with transformed (x, y) tuples.
     """
     # Flatten the list of points and convert to numpy array for easier manipulation
-    points_array = np.array([point for sublist in points for point in sublist])
+    points_array = nparray([point for sublist in points for point in sublist])
 
     # Find the bounding box
-    min_x, min_y = np.min(points_array, axis=0)
-    max_x, max_y = np.max(points_array, axis=0)
+    min_x, min_y = npmin(points_array, axis=0)
+    max_x, max_y = npmax(points_array, axis=0)
 
     # Calculate the current width and height
     current_width = max_x - min_x
@@ -44,17 +44,17 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
     # Translate the points to center them
     translated_points = (
         scaled_points
-        - np.min(scaled_points, axis=0)
-        + np.array(
+        - npmin(scaled_points, axis=0)
+        + nparray(
             [
                 (
                     desired_width
-                    - np.max(scaled_points[:, 0] - np.min(scaled_points[:, 0]))
+                    - npmax(scaled_points[:, 0] - npmin(scaled_points[:, 0]))
                 )
                 / 2,
                 (
                     desired_height
-                    - np.max(scaled_points[:, 1] - np.min(scaled_points[:, 1]))
+                    - npmax(scaled_points[:, 1] - npmin(scaled_points[:, 1]))
                 )
                 / 2,
             ]
