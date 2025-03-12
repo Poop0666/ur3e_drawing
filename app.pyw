@@ -8,7 +8,7 @@ from cameras import get_cameras
 import linedraw.linedraw as linedraw
 import cProfile, pstats
 import command
-import trajectoire.calcul_trajectoire as ct
+import trajectoire.calcul_trajectoire_copy as ct
 import resizer
 import pingger
 from numpy import ndarray
@@ -63,8 +63,8 @@ class VideoApp(ctk.CTk):
         self.slider_label = ctk.CTkLabel(self.controls_frame, text="Select the simplification of the processing")
         self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
         
-        self.slider = ctk.CTkSlider(self.controls_frame, from_=1, to=30, command=self.update_slider)
-        self.slider.set(5)
+        self.slider = ctk.CTkSlider(self.controls_frame, from_=0.1, to=5.0, command=self.update_slider)
+        self.slider.set(2.0)
         self.slider.grid(column=0, pady=5, sticky="ew")
         
         self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()}")
@@ -218,7 +218,7 @@ class VideoApp(ctk.CTk):
             nb_contours = 0
             
         else:
-            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, pointRatio=self.slider.get() ,method=self.dropdown_type.get())
+            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, epsilon=self.slider.get() ,method=self.dropdown_type.get())
         
         self.points_label.configure(text=f"There are {nb_points} points and {nb_contours} contours")
         self.show_preview_image(self.treated_image)

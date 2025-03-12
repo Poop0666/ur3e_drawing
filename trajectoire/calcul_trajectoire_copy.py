@@ -9,7 +9,7 @@ except:
 
 
 def calcul_trajectoire(
-    image: np.ndarray, pointRatio=10, method="bluredcanny", show=False
+    image: np.ndarray, epsilon=2, method="bluredcanny", show=False
 ):
 
     # Put the image in greyscale if it's not the case
@@ -26,11 +26,7 @@ def calcul_trajectoire(
         cv2.imshow("Error Image", image)
         cv2.waitKey()
         
-    if type(pointRatio) is not int:
-        pointRatio = int(pointRatio)
-    
              
-    
     # processes the image using the chosen algorithm
     imgBlur = cv2.GaussianBlur(image,(3,3),0)
     if method == "bluredcanny":
@@ -71,7 +67,6 @@ def calcul_trajectoire(
     contours_approx = []
     for contour in contours:
     # Approximation des contours en polygones avec une précision de 2%
-        epsilon = 0.001 * cv2.arcLength(contour, True)  # epsilon est la précision
         approx = cv2.approxPolyDP(contour, epsilon, True)
         
         # Convertir chaque contour approximé en une liste de tuples de points
