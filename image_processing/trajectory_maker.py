@@ -77,8 +77,8 @@ def calcul_trajectoire(
         
 
     # Plot the contours for preview
-    import matplotlib
-    matplotlib.use("Agg")
+    # import matplotlib
+    # matplotlib.use("Agg")
     from matplotlib import pyplot as plt
 
     fig, ax = plt.subplots(figsize=(10, 8))

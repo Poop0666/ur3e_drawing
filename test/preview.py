@@ -1,4 +1,6 @@
 import cv2
+import sys
+sys.path.append(".")
 import image_processing.trajectory_maker as tm
 
 ratio = 2
