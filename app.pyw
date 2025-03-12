@@ -52,7 +52,7 @@ class VideoApp(ctk.CTk):
         self.processing_label = ctk.CTkLabel(self.controls_frame, text="Select the type of image processing")
         self.processing_label.grid(column=0, padx=20, pady=5, sticky="ew")
 
-        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly", command=self.on_processing_type_change)
+        self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly", command=self.update_preview_image)
         self.dropdown_type.grid(column=0, pady=5, sticky="ew")
         self.dropdown_type.set("bluredcanny")
 
@@ -86,7 +86,6 @@ class VideoApp(ctk.CTk):
 
         self.button3 = ctk.CTkButton(self.controls_frame, text="Start drawing", command=self.start_drawing, state="disabled")
         self.button3.grid(column=0, pady=5, sticky="ew")
-
 
         self.image_label_inversed = False
         # Video Capture
@@ -211,7 +210,7 @@ class VideoApp(ctk.CTk):
         
         image_4_treatement = image_resized if image_resized is not None else self.frame_4_preview
             
-        # check if the method is 'linedrawn' because it's not using the same librairy
+        # check if the method is 'linedraw' because it's not using the same librairy
         if self.dropdown_type.get() == "linedraw":
             size, _ = self.get_label("treated")
             photo = Image.fromarray(image_4_treatement).resize(size)
@@ -275,18 +274,6 @@ class VideoApp(ctk.CTk):
         if self.cap is not None:
             self.cap.release()
         self.destroy()
-
-    def on_processing_type_change(self, choice):
-        """ Hide or show the checkbox based on the selected processing type. """
-        
-        if choice == "linedraw":
-            self.checkbox_hatch_linedraw.grid()
-            self.slider.configure(state="disabled")
-        else:
-            self.slider.configure(state="normal")
-            self.checkbox_hatch_linedraw.grid_remove()
-            
-        self.update_preview_image()
         
     def start_drawing(self):
         self.button3.configure(state="disabled")
