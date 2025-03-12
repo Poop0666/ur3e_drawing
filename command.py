@@ -1,4 +1,3 @@
-from trajectoire.calcul_trajectoire import calcul_trajectoire
 from Control import Control
 from Dashboard import Dashboard
 import cv2
@@ -34,6 +33,7 @@ def startDrawing(points: list):
     
     
 if __name__ == "__main__":
+    from ImageProcessing.calcul_trajectoire import calcul_trajectoire
     image = cv2.imread("image/stick.jpg")
     points = calcul_trajectoire(image,5)
     startDrawing(points)

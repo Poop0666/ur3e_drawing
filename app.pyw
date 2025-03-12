@@ -6,10 +6,10 @@ import customtkinter as ctk
 from tkinter import filedialog
 from PIL import Image
 from cameras import get_cameras
-import linedraw.linedraw as linedraw
+import ImageProcessing.linedraw as linedraw
 import cProfile, pstats
 import command
-import trajectoire.calcul_trajectoire_copy as ct
+import ImageProcessing.calcul_trajectoire_copy as ct
 import resizer
 import pingger
 from numpy import ndarray
