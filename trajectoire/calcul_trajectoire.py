@@ -12,8 +12,8 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
     # Put the image in greyscale if it's not the case
     try:
         if len(image.shape) == 2:
-            cv2.imwrite("binary.png",image)
-            image = cv2.imread("binary.png", cv2.IMREAD_GRAYSCALE)
+            image = cv2.convertScaleAbs(image)
+
         
         elif image.shape[2] != 1:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
