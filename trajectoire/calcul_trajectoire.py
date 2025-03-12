@@ -30,11 +30,9 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         pointRatio = int(pointRatio)
     
              
-    # Preprocess the image (edge detection or thresholding)
-      # Use Canny edge detection
     
+    # processes the image using the chosen algorithm
     imgBlur = cv2.GaussianBlur(image,(3,3),0)
-
     if method == "bluredcanny":
         chosen = cv2.Canny(imgBlur, 50, 150)
     elif method == "laplacian":
