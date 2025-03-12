@@ -31,36 +31,24 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
     
              
     # Preprocess the image (edge detection or thresholding)
-    canny = cv2.Canny(image, 50, 150)  # Use Canny edge detection
+      # Use Canny edge detection
     
     imgBlur = cv2.GaussianBlur(image,(3,3),0)
-    laplacian = cv2.Laplacian(imgBlur,cv2.CV_64F, ksize=3, scale=1)
-    
-    bluredcanny = cv2.Canny(imgBlur, 50, 150)
-    
-    x = cv2.Sobel(image, cv2.CV_64F, 1,0, ksize=3, scale=1)
-    y = cv2.Sobel(image, cv2.CV_64F, 0,1, ksize=3, scale=1)
-    absx= cv2.convertScaleAbs(x)
-    absy = cv2.convertScaleAbs(y)
-    edge = cv2.addWeighted(absx, 0.5, absy, 0.5,0)
-    _, sobel = cv2.threshold(edge, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-    
-    if show:
-        cv2.imshow("Canny", canny)
-        cv2.imshow("Laplacian", laplacian)
-        cv2.imshow("BluredCanny", bluredcanny)
-        cv2.imshow("Sobel", sobel)
-        cv2.waitKey(0)
-    
-    
+
     if method == "bluredcanny":
-        chosen = bluredcanny
+        chosen = cv2.Canny(imgBlur, 50, 150)
     elif method == "laplacian":
-        chosen = laplacian
+        chosen = cv2.Laplacian(imgBlur,cv2.CV_64F, ksize=3, scale=1)
     elif method == "sobel":
-        chosen = sobel
+        x = cv2.Sobel(image, cv2.CV_64F, 1,0, ksize=3, scale=1)
+        y = cv2.Sobel(image, cv2.CV_64F, 0,1, ksize=3, scale=1)
+        absx= cv2.convertScaleAbs(x)
+        absy = cv2.convertScaleAbs(y)
+        edge = cv2.addWeighted(absx, 0.5, absy, 0.5,0)
+        _, chosen = cv2.threshold(edge, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
     else:
-        chosen = canny
+        chosen = cv2.Canny(image, 50, 150)
         
     r = 5
     kernel = np.ones((r,r),np.uint8)
