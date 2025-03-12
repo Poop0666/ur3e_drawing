@@ -4,11 +4,17 @@ It provides functions to convert images into line drawings.
 """
 
 from PIL import Image, ImageOps
-import linedraw.perlin as perlin
 from numpy import array, ndarray, frombuffer, uint8
 from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
-from trajectoire.trajMaker import getTraj
+try:
+    import ImageProcessing.perlin as perlin
+except:
+    import perlin
+try:
+    from ImageProcessing.A4_calibration import fit_to_a4
+except:
+    from A4_calibration import fit_to_a4
 
 
 def distsum(*args: tuple) -> float:
@@ -354,7 +360,7 @@ def output(IM: Image, preview: bool = False):
     """
     lines = sketch(IM)
     nb_points = sum([len(line) for line in lines])
-    trajectory = getTraj(lines, IM.size[1], IM.size[0])
+    trajectory = fit_to_a4(lines, IM.size[1], IM.size[0])
     if preview:
         plt.figure()
         for line in lines:

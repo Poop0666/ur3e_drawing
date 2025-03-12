@@ -1,5 +1,6 @@
 from numpy import array as nparray, min as npmin, max as npmax
 
+
 def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
     """
     Fit a list of points to desired dimensions (90% of A4 by default).
@@ -67,23 +68,53 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
     high_z = 70 / 1000
 
     # Reshape back to the original structure
-    reshaped_points = [[0.344, -0.144, 0.07, 0, 0, 0]] # The robot always starts at this point
+    reshaped_points = [
+        [0.344, -0.144, 0.07, 0, 0, 0]
+    ]  # The robot always starts at this point
     index = 0
     for i in range(len(points)):
         # Goes to the first point without touching the paper
-        coordinates = [float(translated_points[index][0]), float(translated_points[index][1]), high_z, 0, 0, 0]
+        coordinates = [
+            float(translated_points[index][0]),
+            float(translated_points[index][1]),
+            high_z,
+            0,
+            0,
+            0,
+        ]
         reshaped_points.append(coordinates)
         # Goes through all the points with touching the paper
         for j in range(len(points[i])):
-            coordinates = [float(translated_points[index+j][0]), float(translated_points[index+j][1]), low_z, 0, 0, 0]
+            coordinates = [
+                float(translated_points[index + j][0]),
+                float(translated_points[index + j][1]),
+                low_z,
+                0,
+                0,
+                0,
+            ]
             reshaped_points.append(coordinates)
 
-        coordinates = [float(translated_points[index][0]), float(translated_points[index][1]), low_z, 0, 0, 0]
+        coordinates = [
+            float(translated_points[index][0]),
+            float(translated_points[index][1]),
+            low_z,
+            0,
+            0,
+            0,
+        ]
         reshaped_points.append(coordinates)
 
         # Lifts the pen
-        index += len(points[i]) -1
-        coordinates = [float(translated_points[index][0]) ,  float(translated_points[index][1]) , high_z, 0, 0, 0]
+        index += len(points[i]) - 1
+        coordinates = [
+            float(translated_points[index][0]),
+            float(translated_points[index][1]),
+            high_z,
+            0,
+            0,
+            0,
+        ]
         reshaped_points.append(coordinates)
         index += 1
     reshaped_points.append([0.3, 0, 0.07, 0, 0, 0])

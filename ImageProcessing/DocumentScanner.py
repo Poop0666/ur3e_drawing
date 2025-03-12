@@ -1,6 +1,39 @@
-from cv2 import cvtColor, GaussianBlur, Canny, findContours, RETR_LIST, CHAIN_APPROX_SIMPLE, contourArea, arcLength, approxPolyDP, drawMarker, LINE_AA, MARKER_STAR, setMouseCallback, EVENT_LBUTTONDOWN, destroyAllWindows, imshow, waitKey, namedWindow, COLOR_BGR2GRAY, getPerspectiveTransform, warpPerspective
+"""
+This script is based on the Image2Scan project from https://github.com/Manu10744/image2scan.git.
+It provides functions to extract a document from an image.
+"""
+from cv2 import (
+    cvtColor,
+    GaussianBlur,
+    Canny,
+    findContours,
+    RETR_LIST,
+    CHAIN_APPROX_SIMPLE,
+    contourArea,
+    arcLength,
+    approxPolyDP,
+    drawMarker,
+    LINE_AA,
+    MARKER_STAR,
+    setMouseCallback,
+    EVENT_LBUTTONDOWN,
+    destroyAllWindows,
+    imshow,
+    waitKey,
+    namedWindow,
+    COLOR_BGR2GRAY,
+    getPerspectiveTransform,
+    warpPerspective,
+)
 from imutils import resize, grab_contours
-from numpy import array as nparray, argmin as npargmin, argmax as npargmax, diff as npdiff, sqrt as npsqrt, zeros as npzeros
+from numpy import (
+    array as nparray,
+    argmin as npargmin,
+    argmax as npargmax,
+    diff as npdiff,
+    sqrt as npsqrt,
+    zeros as npzeros,
+)
 from skimage.filters import threshold_local
 
 
@@ -35,9 +68,7 @@ class ImageScanner:
         blurred = GaussianBlur(grayscaled, (5, 5), 0)
         edged = Canny(blurred, 75, 200)
 
-        contours = findContours(
-            edged.copy(), RETR_LIST, CHAIN_APPROX_SIMPLE
-        )
+        contours = findContours(edged.copy(), RETR_LIST, CHAIN_APPROX_SIMPLE)
         grabbed = grab_contours(contours)
         sortedContours = sorted(grabbed, key=contourArea, reverse=True)[:5]
 
