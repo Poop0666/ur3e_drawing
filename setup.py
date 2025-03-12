@@ -19,6 +19,7 @@ def create_shortcut(target, shortcut_name, ico):
 
 
 if __name__ == "__main__":
+    os.system("python -m pip install -r requirements.txt")
     target = os.path.join(os.path.dirname(__file__), "app.pyw")
     ico = os.path.join(os.path.dirname(__file__), "tools/robotic-arm.ico")
     create_shortcut(target, "UR3E", ico)
