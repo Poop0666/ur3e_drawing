@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import PIL
 try:
     from trajectoire.A4_calibration import fit_to_a4
 except:
@@ -106,29 +107,34 @@ def calcul_trajectoire(image : np.ndarray, pointRatio = 10, method = "bluredcann
         plt.show()
         
     import matplotlib.pyplot as plt
-    plt.figure(figsize=(8, 8))
-    for trajectory in all_trajectories:
-        trajectory = np.array(trajectory)
-        plt.plot(trajectory[:, 0], trajectory[:, 1], linewidth=1)
+    fig, ax = plt.subplots(figsize=(10, 8))
 
-    plt.axis("off")
+    # Plot each line
+    for line in all_trajectories:
+        x_coords, y_coords = zip(*line)
+        ax.plot(x_coords, y_coords)
+
+    # Set the aspect of the plot to be equal, so the drawing isn't distorted
+    ax.set_aspect('equal')
+    ax.axis('off')
+
+    # Save the plot as an image in a variable
     from io import BytesIO
-    # Save the plot to a bytes buffer
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    # Now buf contains the image data
-    previsualisation = buf.getvalue()
-
-    # Close the buffer and the plot
-    buf.close()
-    plt.close()
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png', bbox_inches='tight', pad_inches=0)
+    buffer.seek(0)
+    image_buffer = buffer.getvalue()
+    # Close the plot to free up memory
+    plt.close(fig)
+    np_image = np.frombuffer(image_buffer, dtype=np.uint8)
+    preview = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+    
     
     #print(f"Nombre de contours : {len(all_trajectories)}")
     points = fit_to_a4(all_trajectories) #getTraj(all_trajectories, height, width)
     nbPoints = len(points)
     nbContours = len(all_trajectories)
-    return points, nbPoints, nbContours, previsualisation
+    return points, nbPoints, nbContours, preview
 
 
 if __name__ == "__main__":
@@ -136,8 +142,8 @@ if __name__ == "__main__":
     image_path = 'image/amongus.jpg'
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     traj = calcul_trajectoire(image, 5)
-    plt.plot(traj[3])
-    plt.show()
+    # plt.imshow(traj[3])
+    # plt.show()
     #with open("coord.txt", "w") as f:
     #    f.write(str(traj))
     #print(traj)
