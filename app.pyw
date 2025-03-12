@@ -3,6 +3,7 @@ os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
 import cv2
 import threading
 import customtkinter as ctk
+from tkinter import filedialog
 from PIL import Image
 from cameras import get_cameras
 import linedraw.linedraw as linedraw
@@ -48,6 +49,9 @@ class VideoApp(ctk.CTk):
 
         self.button1 = ctk.CTkButton(self.controls_frame, text="Refresh", command=self.refresh_cameras)
         self.button1.grid(column=0, pady=5, sticky="ew")
+        
+        self.buttonImport = ctk.CTkButton(self.controls_frame, text="Import a file", command=self.import_file)
+        self.buttonImport.grid(column=0, pady=5, sticky="ew")
 
         self.processing_label = ctk.CTkLabel(self.controls_frame, text="Select the type of image processing")
         self.processing_label.grid(column=0, padx=20, pady=5, sticky="ew")
@@ -63,11 +67,11 @@ class VideoApp(ctk.CTk):
         self.slider_label = ctk.CTkLabel(self.controls_frame, text="Select the simplification of the processing")
         self.slider_label.grid(column=0, padx=20, pady=5, sticky="ew")
         
-        self.slider = ctk.CTkSlider(self.controls_frame, from_=0.1, to=5.0, command=self.update_slider)
-        self.slider.set(2.0)
+        self.slider = ctk.CTkSlider(self.controls_frame, from_=0, to=50, command=self.update_slider)
+        self.slider.set(20)
         self.slider.grid(column=0, pady=5, sticky="ew")
         
-        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()}")
+        self.value_slider_label = ctk.CTkLabel(self.controls_frame, text=f"Actual value : {self.slider.get()/10}")
         self.value_slider_label.grid(column=0, padx=20, sticky="ew")
         
         self.varCheckResize = ctk.BooleanVar(value=False)
@@ -185,7 +189,7 @@ class VideoApp(ctk.CTk):
     def update_slider(self, value):
         """ callback of the slider, update the priview if the slider is untouched during 0.7 second """
         
-        self.value_slider_label.configure(text=f"Actual value : {int(value)}")
+        self.value_slider_label.configure(text=f"Actual value : {int(value)/10}")
         
         with self.lock:
             # cancel the old timer if one is running
@@ -218,7 +222,7 @@ class VideoApp(ctk.CTk):
             nb_contours = 0
             
         else:
-            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, epsilon=self.slider.get() ,method=self.dropdown_type.get())
+            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, epsilon=self.slider.get()/10 ,method=self.dropdown_type.get())
         
         self.points_label.configure(text=f"There are {nb_points} points and {nb_contours} contours")
         self.show_preview_image(self.treated_image)
@@ -255,6 +259,13 @@ class VideoApp(ctk.CTk):
         
         self.image_label_inversed = not self.image_label_inversed
         self.show_preview_image(self.treated_image)
+        
+    def import_file(self):
+        """ function to import a file"""
+        file_path = filedialog.askopenfilename(title="Select a file", filetypes=[("Tous les fichiers", "*.*")])
+        if file_path:
+            self.frame_4_preview = cv2.imread(file_path)
+            self.update_preview_image()
         
         
 
