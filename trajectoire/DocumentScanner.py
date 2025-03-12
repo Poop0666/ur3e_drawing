@@ -1,7 +1,6 @@
-import cv2
+from cv2 import cvtColor, GaussianBlur, Canny, findContours, RETR_LIST, CHAIN_APPROX_SIMPLE, contourArea, arcLength, approxPolyDP, drawMarker, LINE_AA, MARKER_STAR, setMouseCallback, EVENT_LBUTTONDOWN, destroyAllWindows, imshow, waitKey, namedWindow, COLOR_BGR2GRAY, getPerspectiveTransform, warpPerspective
 from imutils import resize, grab_contours
-import numpy as np
-
+from numpy import array as nparray, argmin as npargmin, argmax as npargmax, diff as npdiff, sqrt as npsqrt, zeros as npzeros
 from skimage.filters import threshold_local
 
 
@@ -32,20 +31,20 @@ class ImageScanner:
         cv2_image = resize(self.image, height=640)
 
         # Gray the image and detect edges
-        grayscaled = cv2.cvtColor(cv2_image, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(grayscaled, (5, 5), 0)
-        edged = cv2.Canny(blurred, 75, 200)
+        grayscaled = cvtColor(cv2_image, COLOR_BGR2GRAY)
+        blurred = GaussianBlur(grayscaled, (5, 5), 0)
+        edged = Canny(blurred, 75, 200)
 
-        contours = cv2.findContours(
-            edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
+        contours = findContours(
+            edged.copy(), RETR_LIST, CHAIN_APPROX_SIMPLE
         )
         grabbed = grab_contours(contours)
-        sortedContours = sorted(grabbed, key=cv2.contourArea, reverse=True)[:5]
+        sortedContours = sorted(grabbed, key=contourArea, reverse=True)[:5]
 
         screenCnt = None
         for contour in sortedContours:
-            peri = cv2.arcLength(contour, True)
-            approximation = cv2.approxPolyDP(contour, 0.02 * peri, True)
+            peri = arcLength(contour, True)
+            approximation = approxPolyDP(contour, 0.02 * peri, True)
 
             # If approx. contour has four points, then we can assume that we have found the document
             if len(approximation) == 4:
@@ -54,19 +53,19 @@ class ImageScanner:
 
         # If OpenCV failed to detect 4 edges, let the user choose 4 points
         if screenCnt is None:
-            cv2.namedWindow("Select 4 Points and click on 'X'")
-            cv2.setMouseCallback(
+            namedWindow("Select 4 Points and click on 'X'")
+            setMouseCallback(
                 "Select 4 Points and click on 'X'", self.__select_points, cv2_image
             )
 
             while len(self.user_defined_contours) != 4:
-                cv2.imshow("Select 4 Points and click on 'X'", cv2_image)
-                cv2.waitKey(1)
+                imshow("Select 4 Points and click on 'X'", cv2_image)
+                waitKey(1)
 
-            cv2.destroyAllWindows()
+            destroyAllWindows()
 
             # Transform the user defined points into a numpy array which openCV expects
-            screenCnt = np.array(self.user_defined_contours)
+            screenCnt = nparray(self.user_defined_contours)
 
         return screenCnt
 
@@ -76,15 +75,15 @@ class ImageScanner:
         :param x:  x-coordinate of the clicked point
         :param y:  y-coordinate of the clicked point
         """
-        if event == cv2.EVENT_LBUTTONDOWN:
-            cv2.drawMarker(
+        if event == EVENT_LBUTTONDOWN:
+            drawMarker(
                 image,
                 (x, y),
                 (0, 0, 255),
-                markerType=cv2.MARKER_STAR,
+                markerType=MARKER_STAR,
                 markerSize=10,
                 thickness=1,
-                line_type=cv2.LINE_AA,
+                line_type=LINE_AA,
             )
 
             self.user_defined_contours.append([x, y])
@@ -96,7 +95,7 @@ class ImageScanner:
             self.image, screenCnt.reshape(4, 2) * ratio
         )
 
-        transformed_grayscaled = cv2.cvtColor(transformed, cv2.COLOR_BGR2GRAY)
+        transformed_grayscaled = cvtColor(transformed, COLOR_BGR2GRAY)
         threshold = threshold_local(
             transformed_grayscaled, 11, offset=10, method="gaussian"
         )
@@ -109,18 +108,18 @@ class ImageScanner:
     def __order_points(self, pts):
         # initialzie a list of coordinates that will be ordered such that the first entry in the list is the top-left,
         # the second entry is the top-right, the third is the bottom-right, and the fourth is the bottom-left
-        rect = np.zeros((4, 2), dtype="float32")
+        rect = npzeros((4, 2), dtype="float32")
 
         # the top-left point will have the smallest sum, whereas the bottom-right point will have the largest sum
         s = pts.sum(axis=1)
-        rect[0] = pts[np.argmin(s)]
-        rect[2] = pts[np.argmax(s)]
+        rect[0] = pts[npargmin(s)]
+        rect[2] = pts[npargmax(s)]
 
         # now, compute the difference between the points, the top-right point will have the smallest difference,
         # whereas the bottom-left will have the largest difference
-        diff = np.diff(pts, axis=1)
-        rect[1] = pts[np.argmin(diff)]
-        rect[3] = pts[np.argmax(diff)]
+        diff = npdiff(pts, axis=1)
+        rect[1] = pts[npargmin(diff)]
+        rect[3] = pts[npargmax(diff)]
 
         # return the ordered coordinates
         return rect
@@ -132,20 +131,20 @@ class ImageScanner:
 
         # compute the width of the new image, which will be the maximum distance between bottom-right and bottom-left
         # x-coordiates or the top-right and top-left x-coordinates
-        widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-        widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+        widthA = npsqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+        widthB = npsqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
         maxWidth = max(int(widthA), int(widthB))
 
         # compute the height of the new image, which will be the maximum distance between the top-right and bottom-right
         # y-coordinates or the top-left and bottom-left y-coordinates
-        heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-        heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+        heightA = npsqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+        heightB = npsqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
         maxHeight = max(int(heightA), int(heightB))
 
         # now that we have the dimensions of the new image, construct the set of destination points to obtain a
         # "birds eye view",(i.e. top-down view) of the image, again specifying points in the top-left, top-right,
         # bottom-right, and bottom-left order
-        dst = np.array(
+        dst = nparray(
             [
                 [0, 0],
                 [maxWidth - 1, 0],
@@ -156,8 +155,8 @@ class ImageScanner:
         )
 
         # compute the perspective transform matrix and then apply it
-        M = cv2.getPerspectiveTransform(rect, dst)
-        warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+        M = getPerspectiveTransform(rect, dst)
+        warped = warpPerspective(image, M, (maxWidth, maxHeight))
 
         # return the warped image
         return warped
@@ -167,14 +166,6 @@ class ImageScanner:
         :param title:  The title to use for the GUI window
         :param image:  The image object to display in the GUI window
         """
-        cv2.imshow(title, resize(image, height=640))
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-
-if __name__ == '__main__':
-    image = cv2.imread(r"C:\Users\nolan\Desktop\p\image2scan\test\resources\test2.jpg") 
-    destination = None 
-
-    scanner = ImageScanner(image, destination)
-    scanner.scan()
+        imshow(title, resize(image, height=640))
+        waitKey(0)
+        destroyAllWindows()
