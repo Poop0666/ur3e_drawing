@@ -1,11 +1,12 @@
 import sys
 import logging
-from connector import RTDEConnect
+from rtde.connector import RTDEConnect
+import os
 sys.path.append('..')
 
 class Control():
 
-    def __init__(self, ROBOT_HOST = '169.254.123.187', ROBOT_PORT = 30004, config_filename = 'control_configuration.xml') -> None:
+    def __init__(self, ROBOT_HOST = os.getenv("HOST"), ROBOT_PORT = os.getenv("PORT_RTDE"), config_filename = os.getenv("CONTROL_CONFIGURATION")) -> None:
         self.ROBOT_HOST = ROBOT_HOST
         self.ROBOT_PORT = ROBOT_PORT
         self.config_filename = config_filename

@@ -8,11 +8,11 @@ from numpy import array, ndarray, frombuffer, uint8
 from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
 try:
-    import ImageProcessing.perlin as perlin
+    import image_processing.perlin as perlin
 except:
     import perlin
 try:
-    from ImageProcessing.A4_calibration import fit_to_a4
+    from image_processing.A4_calibration import fit_to_a4
 except:
     from A4_calibration import fit_to_a4
 

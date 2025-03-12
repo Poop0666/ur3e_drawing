@@ -1,7 +1,7 @@
 import os
 
 def check_ping():
-    hostname = "169.254.123.187"
+    hostname = os.getenv("HOST")
     response = os.system("ping " + hostname)
     # and then check the response...
     if response == 0:

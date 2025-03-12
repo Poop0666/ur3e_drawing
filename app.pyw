@@ -5,14 +5,17 @@ import threading
 import customtkinter as ctk
 from tkinter import filedialog
 from PIL import Image
-from cameras import get_cameras
-import ImageProcessing.linedraw as linedraw
+from tools.cameras import get_cameras
+import image_processing.linedraw as linedraw
 import cProfile, pstats
-import command
-import ImageProcessing.calcul_trajectoire_copy as ct
-import resizer
-import pingger
+import rtde.command as command
+import image_processing.trajectory_maker as ct
+import tools.resizer as resizer
+import tools.pingger as pingger
+from dotenv import load_dotenv
 from numpy import ndarray
+
+load_dotenv("config/.env")
 
 class VideoApp(ctk.CTk):
     def __init__(self):

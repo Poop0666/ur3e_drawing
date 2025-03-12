@@ -3,7 +3,7 @@ import numpy as np
 import imutils
 
 try:
-    from ImageProcessing.A4_calibration import fit_to_a4
+    from image_processing.A4_calibration import fit_to_a4
 except:
     from A4_calibration import fit_to_a4
 

@@ -62,7 +62,7 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
         )
     )
     # Put in m and adds the offset
-    translated_points = (translated_points / 1000) + (0.350, 0.0)
+    translated_points = (translated_points / 1000) + (0.250, -0.260)
 
     low_z = 58.5 / 1000
     high_z = 70 / 1000

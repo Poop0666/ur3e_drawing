@@ -27,13 +27,16 @@ import rtde.rtde as rtde
 import rtde.rtde_config as rtde_config
 import xml.etree.ElementTree as ET
 import csv
+import os
+from dotenv import load_dotenv
 sys.path.append('..')
 
-ROBOT_HOST = '192.168.0.2'
-ROBOT_PORT = 30004
+load_dotenv("config/.env")
+ROBOT_HOST = os.getenv("HOST")
+ROBOT_PORT = int(os.getenv("PORT_RTDE"))
 config_filename = 'rtdeIO.xml'
-RTDE_inputs = 'RTDE_Inputs.csv'
-RTDE_outputs = 'RTDE_Outputs.csv'
+RTDE_inputs = os.getenv("RTDE_INPUTS")
+RTDE_outputs = os.getenv("RTDE_OUTPUTS")
 
 
 class RTDEConnect:
@@ -42,7 +45,7 @@ class RTDEConnect:
 
     def __init__(self, robot_ip, filename, frequency=500):
         self.robotIP = robot_ip
-        self.port = 30004
+        self.port = ROBOT_PORT
         self.con = rtde.RTDE(self.robotIP, self.port)
         self.keep_running = True
         self.config = filename

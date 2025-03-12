@@ -26,6 +26,7 @@ import socket
 import select
 import sys
 import logging
+import os
 
 if sys.version_info[0] < 3:
   import serialize
@@ -68,7 +69,7 @@ class RTDETimeoutException(RTDEException):
         super(RTDETimeoutException, self).__init__(msg)
 
 class RTDE(object):
-    def __init__(self, hostname, port=30004):
+    def __init__(self, hostname, port=os.getenv("PORT_RTDE")):
         self.hostname = hostname
         self.port = port
         self.__conn_state = ConnectionState.DISCONNECTED

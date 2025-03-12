@@ -1,9 +1,10 @@
-from Control import Control
-from Dashboard import Dashboard
+from rtde.Control import Control
+from rtde.Dashboard import Dashboard
 import cv2
 import logging
 from threading import Thread
 import time
+import os
 
 def sendCoords(points: list):
     con = Control()
@@ -14,7 +15,7 @@ def startDrawing(points: list):
     sCoordsT.start()
         
     time.sleep(2)
-    dash = Dashboard('169.254.123.187')
+    dash = Dashboard(os.getenv("HOST"))
     dash.connect()
     
     #Check to see if robot is in remote mode.
@@ -33,7 +34,7 @@ def startDrawing(points: list):
     
     
 if __name__ == "__main__":
-    from ImageProcessing.calcul_trajectoire import calcul_trajectoire
+    from image_processing.trajectory_maker import calcul_trajectoire
     image = cv2.imread("image/stick.jpg")
     points = calcul_trajectoire(image,5)
     startDrawing(points)

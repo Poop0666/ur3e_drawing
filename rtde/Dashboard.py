@@ -4,21 +4,23 @@
 import socket
 import sys
 import logging
+import os
 
 # Enter robot IP address here.
-host = '169.254.123.187'
+host = os.getenv("HOST")
 
 
 class Dashboard:
     def __init__(self, robotIP):
         self.robotIP = robotIP
-        self.port = 29999
-        self.timeout = 5
+        self.port = int(os.getenv("PORT_DASHBOARD"))
+        self.timeout = int(os.getenv("TIMEOUT"))
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         logging.getLogger().setLevel(logging.INFO)
 
     def connect(self):
         self.sock.settimeout(self.timeout)
+        print(self.robotIP, self.port)
         self.sock.connect((self.robotIP, self.port))
         # Receive initial "Connected" Header
         self.sock.recv(1096)

@@ -1,5 +1,6 @@
 **/__pycache__
 *test*
+!/test
 .venv
 # Ignore common image file types
 *.png
