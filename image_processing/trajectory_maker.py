@@ -27,6 +27,10 @@ def calcul_trajectoire(
         cv2.waitKey()
         
              
+    print(image.shape)
+    if image.shape[0] > image.shape[1]:
+        image = np.transpose(image.copy())
+        
     # processes the image using the chosen algorithm
     imgBlur = cv2.GaussianBlur(image,(3,3),0)
     if method == "bluredcanny":
@@ -77,8 +81,8 @@ def calcul_trajectoire(
         
 
     # Plot the contours for preview
-    # import matplotlib
-    # matplotlib.use("Agg")
+    import matplotlib
+    matplotlib.use("Agg")
     from matplotlib import pyplot as plt
 
     fig, ax = plt.subplots(figsize=(10, 8))

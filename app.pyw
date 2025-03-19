@@ -190,7 +190,7 @@ class VideoApp(ctk.CTk):
         
         
     def update_slider(self, value):
-        """ callback of the slider, update the priview if the slider is untouched during 0.7 second """
+        """ callback of the slider, update the priview if the slider is untouched during 0.4 second """
         
         self.value_slider_label.configure(text=f"Actual value : {int(value)/10}")
         
@@ -200,7 +200,7 @@ class VideoApp(ctk.CTk):
                 self.timer.cancel()
                 
             # start the timer
-            self.timer = threading.Timer(0.7, self.update_preview_image)
+            self.timer = threading.Timer(0.4, self.update_preview_image)
             self.timer.start()
     
         
