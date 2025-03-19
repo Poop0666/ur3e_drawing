@@ -12,3 +12,7 @@
 *.svg
 *.ico
 *.webp
+!/image/*
+/build
+/dist
+app.spec
