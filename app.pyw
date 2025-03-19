@@ -297,14 +297,6 @@ class VideoApp(ctk.CTk):
         drawing_thread.start()
         
     def thread_drawing(self):
-        from matplotlib import pyplot as plt
-        fig, ax = plt.subplots(figsize=(10, 8))
-        x_coords = [point[0] for point in self.points]
-        y_coords = [point[1] for point in self.points]
-        ax.set_aspect("equal")
-        ax.plot(x_coords, y_coords)
-        plt.show()
-        plt.close(fig)
         command.startDrawing(self.points)
         self.button3.configure(state="enabled")
         
