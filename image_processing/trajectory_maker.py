@@ -51,8 +51,6 @@ def calcul_trajectoire(
         cv2.imshow("Error Image", image)
         cv2.waitKey()
         
-             
-    print(image.shape)
     if image.shape[0] > image.shape[1]:
         image = np.transpose(image.copy())
         
