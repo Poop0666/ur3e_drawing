@@ -1,6 +1,31 @@
 import cv2
 import numpy as np
 import imutils
+from frechetdist import frdist
+from scipy.interpolate import interp1d
+import numpy as np
+from math import dist
+from shapely.geometry import Polygon
+
+def calculate_area_perimeter_center(coords):
+    polygon = Polygon(coords)
+    area = polygon.area
+    perimeter = polygon.length
+    centroid = polygon.centroid
+    return area, perimeter, (centroid.x, centroid.y)
+
+def compare_shapes(coords1, coords2, area_tolerance=0.1, perimeter_tolerance=0.1, distance_tolerance=10):
+    area1, perimeter1, centroid1 = calculate_area_perimeter_center(coords1)
+    area2, perimeter2, centroid2 = calculate_area_perimeter_center(coords2)
+
+    area_similarity = abs(area1 - area2) / max(area1, area2)
+    perimeter_similarity = abs(perimeter1 - perimeter2) / max(perimeter1, perimeter2)
+    distance_similarity = dist(centroid1, centroid2)
+
+    if area_similarity <= area_tolerance and perimeter_similarity <= perimeter_tolerance and distance_similarity <= distance_tolerance:
+        return True
+    else:
+        return False
 
 try:
     from image_processing.A4_calibration import fit_to_a4
@@ -76,8 +101,15 @@ def calcul_trajectoire(
         # Convertir chaque contour approximé en une liste de tuples de points
         contour_points = [(point[0][0] - center_x, - point[0][1] + center_y) for point in approx]
         
-        # Ajouter le contour approximé à la liste
-        contours_approx.append(contour_points)
+        # Ajouter le contour approximé à la liste si il ne ressemble pas à un présent
+        flag = True
+        if len(contours_approx) != 0:
+            for line in contours_approx:
+                if compare_shapes(line, contour_points):
+                    flag = False
+                    break
+        if flag:
+            contours_approx.append(contour_points)
         
 
     # Plot the contours for preview
@@ -88,9 +120,10 @@ def calcul_trajectoire(
     fig, ax = plt.subplots(figsize=(10, 8))
 
     # Plot each line
-    for line in contours_approx:
+    for i,line in enumerate(contours_approx):
         x_coords, y_coords = zip(*line)
         ax.plot(x_coords, y_coords)
+        
 
     # Set the aspect of the plot to be equal, so the drawing isn't distorted
     ax.set_aspect("equal")
