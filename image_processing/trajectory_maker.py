@@ -103,7 +103,7 @@ def calcul_trajectoire(
         flag = True
         if len(contours_approx) != 0:
             for line in contours_approx:
-                if compare_shapes(line, contour_points):
+                if len(contour_points) < 4 or compare_shapes(line, contour_points):
                     flag = False
                     break
         if flag:
