@@ -11,3 +11,7 @@
 *.tiff
 *.svg
 *.webp
+!/image/*
+/build
+/dist
+app.spec
