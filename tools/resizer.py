@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 
 def binaryResizeA4(image : np.ndarray, seuil = 150):
+    cv2.imwrite("picture.png",image)
+    
     x = cv2.Sobel(image, cv2.CV_64F, 1,0, ksize=3, scale=1)
     y = cv2.Sobel(image, cv2.CV_64F, 0,1, ksize=3, scale=1)
     absx= cv2.convertScaleAbs(x)
@@ -31,22 +33,25 @@ def binaryResizeA4(image : np.ndarray, seuil = 150):
 
     cv2.rectangle(image, (x, y), (x + w, y + h), (0,0,255), 2)
     new_image = image[y:y+h, x:x+w]
+    cv2.imwrite("new_image.png", new_image)
     grey = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
 
     # add the white around the page
     for y in range(25):
         for x in range(grey.shape[0]):
             if grey[x][y] < seuil +25:
-                grey[x][y] = 255 
+                grey[x][y] = 170
             if grey[x][grey.shape[1]-y-1] <= seuil+25:
-                grey[x][grey.shape[1]-y-1] = 255
+                grey[x][grey.shape[1]-y-1] = 170
                 
     for x in range(25):
         for y in range(grey.shape[1]):
             if grey[x][y] < seuil+25:
-                grey[x][y] = 255 
+                grey[x][y] = 170 
             if grey[grey.shape[0]-x-1][y] <= seuil+25:
-                grey[grey.shape[0]-x-1][y] = 255
+                grey[grey.shape[0]-x-1][y] = 170
+
+    cv2.imwrite("grey.png", grey)
 
     ret = np.where(grey > seuil, 255, 0)
     cv2.imwrite("binary.png", ret)

@@ -10,6 +10,7 @@ import image_processing.linedraw as linedraw
 import cProfile, pstats
 import rtde.command as command
 import image_processing.trajectory_maker as ct
+from image_processing.DocumentScanner import ImageScanner
 import tools.resizer as resizer
 import tools.pingger as pingger
 from dotenv import load_dotenv
@@ -213,7 +214,8 @@ class VideoApp(ctk.CTk):
         
         image_resized = None
         if self.varCheckResize.get():
-            image_resized = resizer.binaryResizeA4(self.frame_4_preview)
+            #image_resized = resizer.binaryResizeA4(self.frame_4_preview)
+            image_resized = ImageScanner(self.frame_4_preview,"").scan()
         
         image_4_treatement = image_resized if image_resized is not None else self.frame_4_preview
             
