@@ -107,7 +107,10 @@ def calcul_trajectoire(
                     flag = False
                     break
         if flag:
+            contours_approx.append(contours_approx[0])
             contours_approx.append(contour_points)
+
+        
         
 
     # Plot the contours for preview
