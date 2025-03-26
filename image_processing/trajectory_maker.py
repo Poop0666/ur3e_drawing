@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
 import imutils
-from frechetdist import frdist
-from scipy.interpolate import interp1d
 import numpy as np
 from math import dist
 from shapely.geometry import Polygon
@@ -107,7 +105,7 @@ def calcul_trajectoire(
                     flag = False
                     break
         if flag:
-            contours_approx.append(contours_approx[0])
+            contour_points.append(contour_points[0])
             contours_approx.append(contour_points)
 
         
