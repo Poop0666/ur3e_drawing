@@ -56,7 +56,7 @@ class ImageScanner:
         in the destination directory as pdf file"""
         screenContours = self.__analyze_contours()
         scan_img = self.__transform_and_scan(screenContours)
-
+        return scan_img
         self.__show_intermediate_result("Scanned Image", scan_img)
 
     def __analyze_contours(self):
