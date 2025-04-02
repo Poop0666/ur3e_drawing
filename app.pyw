@@ -1,5 +1,5 @@
-import os
-os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
+from os import environ
+environ["OPENCV_LOG_LEVEL"] = "SILENT"
 import cv2
 import threading
 import customtkinter as ctk

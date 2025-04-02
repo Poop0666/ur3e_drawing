@@ -45,7 +45,6 @@ class ImageScanner:
         """
         :param image: Path to the image to scan
         :param destination:  Path to destination directory to store the scan result in
-        :param show_results: Specifies whether to show intermediate results in GUI windows or not
         """
         self.image = image
         self.destination = destination

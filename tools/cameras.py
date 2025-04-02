@@ -1,6 +1,6 @@
-import os
-os.environ["OPENCV_LOG_LEVEL"]="SILENT"
-import cv2
+from os import environ
+environ["OPENCV_LOG_LEVEL"]="SILENT"
+from cv2 import VideoCapture, CAP_DSHOW
 
 def get_cameras():
     """
@@ -9,7 +9,7 @@ def get_cameras():
     index = 0
     arr = []
     while True:
-        cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+        cap = VideoCapture(index, CAP_DSHOW)
         if not cap.read()[0]:
             break
         else:
