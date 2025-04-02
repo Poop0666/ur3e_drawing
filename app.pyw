@@ -3,7 +3,7 @@ os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
 import cv2
 import threading
 import customtkinter as ctk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PIL import Image
 from tools.cameras import get_cameras
 import image_processing.linedraw as linedraw
@@ -11,6 +11,7 @@ import cProfile, pstats
 import rtde.command as command
 import image_processing.trajectory_maker as ct
 from image_processing.DocumentScanner import ImageScanner
+from image_processing import image_scanner
 import tools.resizer as resizer
 import tools.pingger as pingger
 from dotenv import load_dotenv
@@ -215,7 +216,9 @@ class VideoApp(ctk.CTk):
         image_resized = None
         if self.varCheckResize.get():
             #image_resized = resizer.binaryResizeA4(self.frame_4_preview)
-            image_resized = ImageScanner(self.frame_4_preview,"").scan()
+            #image_resized = ImageScanner(self.frame_4_preview,"").scan()
+            document_contour = image_scanner.scan_detection(self.frame_4_preview)
+            image_resized = image_scanner.four_point_transform(self.frame_4_preview, document_contour.reshape(4, 2))
         
         image_4_treatement = image_resized if image_resized is not None else self.frame_4_preview
             
@@ -293,14 +296,22 @@ class VideoApp(ctk.CTk):
         
     def start_drawing(self):
         self.button3.configure(state="disabled")
-        pingger.check_ping()
         drawing_thread = threading.Thread(target=self.thread_drawing)
         drawing_thread.daemon = True
         drawing_thread.start()
         
     def thread_drawing(self):
-        command.startDrawing(self.points)
-        self.button3.configure(state="enabled")
+        response = pingger.check_ping()
+        if response.count("Impossible") >= 4:
+            messagebox.showerror("Connection's error", "The connection to the robot isn't possible\nVerify all and try again")
+            self.button3.configure(state="normal")
+            return
+        ret = command.startDrawing(self.points)
+        if "error" in ret:
+            messagebox.showwarning('Connection forbiden','The robot is in local mode. \nPlease change it in remote mode.')
+        else:
+            messagebox.showinfo("Succes","The drawing finished succesfully")
+        self.button3.configure(state="normal")
         
 
 

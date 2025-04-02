@@ -22,6 +22,7 @@ def startDrawing(points: list):
     remoteCheck = dash.sendAndReceive('is in remote control')
     if 'false' in remoteCheck:
         logging.warning('Robot is in local mode. Some commands may not function.')
+        return "error: local mode"
     else:
         print("The robot will start.")
         

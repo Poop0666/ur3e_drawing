@@ -7,7 +7,7 @@ from shapely.geometry import Polygon
 
 def calculate_area_perimeter_center(coords):
     polygon = Polygon(coords)
-    area = polygon.area
+    area = polygon.area + 1
     perimeter = polygon.length
     centroid = polygon.centroid
     return area, perimeter, (centroid.x, centroid.y)

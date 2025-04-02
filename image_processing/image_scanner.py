@@ -1,5 +1,6 @@
 from cv2 import (
     cvtColor,
+    RETR_TREE,
     COLOR_BGR2GRAY,
     GaussianBlur,
     threshold as cv2threshold,
@@ -15,6 +16,7 @@ from cv2 import (
     setMouseCallback,
     imshow,
     waitKey,
+    drawContours,
     destroyAllWindows,
     EVENT_LBUTTONDOWN,
     drawMarker,
@@ -31,22 +33,34 @@ user_defined_contours = []
 def scan_detection(image):
     WIDTH = 1280
     HEIGHT = 720
+    global user_defined_contours
+    user_defined_contours = []
     document_contour = array([[0, 0], [WIDTH, 0], [WIDTH, HEIGHT], [0, HEIGHT]])
 
     gray = cvtColor(image, COLOR_BGR2GRAY)
     blur = GaussianBlur(gray, (5, 5), 0)
     _, threshold = cv2threshold(blur, 0, 255, THRESH_BINARY + THRESH_OTSU)
 
-    contours, _ = findContours(threshold, RETR_LIST, CHAIN_APPROX_SIMPLE)
-    contours = sorted(contours, key=contourArea, reverse=True)
+    contours, _ = findContours(threshold, RETR_TREE, CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key=contourArea, reverse=True)[0]
+    
 
     max_area = 0
-    for contour in contours:
+    for contour in [contours]:
         area = contourArea(contour)
         if area > 1000:
             peri = arcLength(contour, True)
             approx = approxPolyDP(contour, 0.015 * peri, True)
             if area > max_area and len(approx) == 4:
+                print(approx)
+                approx[0][0][0] += 20
+                approx[0][0][1] += 20
+                approx[1][0][0] += 20
+                approx[1][0][1] -= 20
+                approx[2][0][0] -= 20
+                approx[2][0][1] -= 20
+                approx[3][0][0] -= 20
+                approx[3][0][1] += 20
                 document_contour = approx
                 max_area = area
             else:
@@ -55,7 +69,6 @@ def scan_detection(image):
                 
 
                 while len(user_defined_contours) != 4:
-                    print(len(user_defined_contours))
                     imshow("Select 4 Points and click on 'X'", cv2_image)
                     setMouseCallback(
                     "Select 4 Points and click on 'X'", select_points, cv2_image
@@ -65,7 +78,7 @@ def scan_detection(image):
                 destroyAllWindows()
 
                 # Transform the user defined points into a numpy array which openCV expects
-                defined_contours = array(user_defined_contours)
+                document_contour = array(user_defined_contours)
     return document_contour
 
 
@@ -85,7 +98,8 @@ def select_points(event, x, y, flags, image):
             thickness=1,
             line_type=LINE_AA,
         )
-
+    
+        global user_defined_contours
         user_defined_contours.append([x, y])
 
 

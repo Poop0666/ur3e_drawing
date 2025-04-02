@@ -5,6 +5,7 @@ import socket
 import sys
 import logging
 import os
+from tkinter import messagebox
 
 # Enter robot IP address here.
 host = os.getenv("HOST")
@@ -31,6 +32,7 @@ class Dashboard:
             return self.get_reply()
         except (ConnectionResetError, ConnectionAbortedError):
             logging.warning('The connection was lost to the robot. Please connect and try running again.')
+            messagebox.showwarning('Connection lost','The connection was lost to the robot. \nPlease connect and try running again.')
             self.close()
             sys.exit()
 
