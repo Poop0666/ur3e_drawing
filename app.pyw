@@ -296,7 +296,7 @@ class VideoApp(CTk):
 
         else:
             self.points, nb_points, nb_contours, self.treated_image = (
-                ct.calcul_trajectoire(
+                ct.trajectory_computation(
                     image_4_treatement,
                     epsilon=self.slider.get() / 10,
                     method=self.dropdown_type.get(),

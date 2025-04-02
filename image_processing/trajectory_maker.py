@@ -59,7 +59,7 @@ def compare_shapes(coords1, coords2, area_tolerance=0.1, perimeter_tolerance=0.1
     else:
         return False
 
-def calcul_trajectoire(
+def trajectory_computation(
     image: ndarray, epsilon=2, method="bluredcanny", show=False
 ):
 
