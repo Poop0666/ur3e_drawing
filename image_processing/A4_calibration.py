@@ -1,4 +1,5 @@
 from numpy import array as nparray, min as npmin, max as npmax
+import os
 
 
 def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
@@ -66,6 +67,9 @@ def fit_to_a4(points, desired_width=189, desired_height=267.3, z=58.5 / 1000):
 
     low_z = 55 / 1000
     high_z = 70 / 1000
+    
+    low_z = (float(os.getenv("PEN_HEIGHT_MM")) + 12.5) /1000
+    high_z = low_z + (15 / 1000)
 
     # Reshape back to the original structure
     reshaped_points = [

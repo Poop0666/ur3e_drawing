@@ -64,6 +64,7 @@ class VideoApp(ctk.CTk):
         self.dropdown_type = ctk.CTkComboBox(self.controls_frame, values=["canny", "bluredcanny", "sobel", "linedraw"], state="readonly", command=self.update_preview_image)
         self.dropdown_type.grid(column=0, pady=5, sticky="ew")
         self.dropdown_type.set("bluredcanny")
+    
 
         self.checkbox_hatch_linedraw = ctk.CTkCheckBox(self.controls_frame, text="Hatch linedraw", variable=ctk.BooleanVar(value=True))
         self.checkbox_hatch_linedraw.grid(column=0, pady=5, sticky="ew")
@@ -122,6 +123,7 @@ class VideoApp(ctk.CTk):
         # Needed for the slider's callback
         self.timer = None
         self.lock = threading.Lock()
+        
     
     def take_photo(self):
         if self.frame is not None:
@@ -206,7 +208,7 @@ class VideoApp(ctk.CTk):
             self.timer.start()
     
         
-    def update_preview_image(self):
+    def update_preview_image(self, _ = None):
         """ update the frame of the preview """
         
         # check if a preview already exist

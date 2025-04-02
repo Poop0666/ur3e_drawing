@@ -31,7 +31,7 @@ def startDrawing(points: list):
     sCoordsT.join()
     dash.sendAndReceive("stop\n")
     dash.close()
-    print("Dessin terminé")
+    return "Dessin terminé"
     
     
 if __name__ == "__main__":
