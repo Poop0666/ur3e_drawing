@@ -31,7 +31,7 @@ except:
     from A4_calibration import fit_to_a4
 
 
-def calcul_trajectoire(
+def trajectory_computation(
     image: np.ndarray, epsilon=2, method="bluredcanny", show=False
 ):
 
@@ -153,4 +153,4 @@ if __name__ == "__main__":
     # Load the image
     image_path = "image/amongus.jpg"
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = calcul_trajectoire(image, 5, show=False)
+    traj = trajectory_computation(image, 5, show=False)

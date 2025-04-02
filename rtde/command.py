@@ -26,7 +26,7 @@ def startDrawing(points: list):
     else:
         print("The robot will start.")
         
-    dash.sendAndReceive("load rtde_control_loop.")
+    dash.sendAndReceive("load rtde_control_loop.urp")
     dash.sendAndReceive("play\n")
     sCoordsT.join()
     dash.sendAndReceive("stop\n")
@@ -35,9 +35,9 @@ def startDrawing(points: list):
     
     
 if __name__ == "__main__":
-    from image_processing.trajectory_maker import calcul_trajectoire
+    from image_processing.trajectory_maker import trajectory_computation
     image = cv2.imread("image/stick.jpg")
-    points = calcul_trajectoire(image,5)
+    points = trajectory_computation(image,5)
     startDrawing(points)
     
 

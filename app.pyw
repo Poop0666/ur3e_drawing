@@ -232,7 +232,7 @@ class VideoApp(ctk.CTk):
             nb_contours = 0
             
         else:
-            self.points, nb_points, nb_contours, self.treated_image = ct.calcul_trajectoire(image_4_treatement, epsilon=self.slider.get()/10 ,method=self.dropdown_type.get())
+            self.points, nb_points, nb_contours, self.treated_image = ct.trajectory_computation(image_4_treatement, epsilon=self.slider.get()/10 ,method=self.dropdown_type.get())
         
         self.points_label.configure(text=f"There are {nb_points} points and {nb_contours} contours")
         self.show_preview_image(self.treated_image)

@@ -1,4 +1,4 @@
-from trajectoire.calcul_trajectoire import calcul_trajectoire
+from trajectoire.trajectory_computation import trajectory_computation
 from Control import Control
 from Dashboard import Dashboard
 import cv2
@@ -13,7 +13,7 @@ def test(trajectoire):
 
 def main(filename: str, allProgram = False):
     image = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
-    trajectoire, _, _, _ = calcul_trajectoire(image,pointRatio=1)
+    trajectoire, _, _, _ = trajectory_computation(image,pointRatio=1)
     
     setp1 = [0.250, 0.100, 0.040, 0, 0, 0]
     setp2 = [0.350, 0.100, 0.040, 0, 0, 0]
