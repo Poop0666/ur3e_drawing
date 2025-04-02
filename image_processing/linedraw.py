@@ -4,7 +4,7 @@ It provides functions to convert images into line drawings.
 """
 
 from PIL import Image, ImageOps
-from numpy import array, ndarray, frombuffer, uint8
+from numpy import array, frombuffer, uint8
 from cv2 import Canny, GaussianBlur
 import matplotlib.pyplot as plt
 try:

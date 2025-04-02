@@ -1,9 +1,43 @@
-import cv2
-import numpy as np
-import imutils
-import numpy as np
+from cv2 import (
+    convertScaleAbs,
+    imshow,
+    waitKey,
+    cvtColor,
+    GaussianBlur,
+    Canny,
+    Laplacian,
+    Sobel,
+    addWeighted,
+    findContours,
+    CV_64F,
+    COLOR_BGR2GRAY,
+    CHAIN_APPROX_SIMPLE,
+    contourArea,
+    approxPolyDP,
+    threshold,
+    THRESH_BINARY,
+    THRESH_OTSU,
+    morphologyEx,
+    MORPH_CLOSE,
+    RETR_TREE,
+    imdecode,
+    IMREAD_COLOR,
+)
+from numpy import (
+    transpose,
+    ndarray,
+    uint8,
+    ones,
+    frombuffer,
+)
+from imutils import grab_contours
 from math import dist
 from shapely.geometry import Polygon
+
+try:
+    from image_processing.A4_calibration import fit_to_a4
+except:
+    from A4_calibration import fit_to_a4
 
 def calculate_area_perimeter_center(coords):
     polygon = Polygon(coords)
@@ -25,64 +59,58 @@ def compare_shapes(coords1, coords2, area_tolerance=0.1, perimeter_tolerance=0.1
     else:
         return False
 
-try:
-    from image_processing.A4_calibration import fit_to_a4
-except:
-    from A4_calibration import fit_to_a4
-
-
-def trajectory_computation(
-    image: np.ndarray, epsilon=2, method="bluredcanny", show=False
+def calcul_trajectoire(
+    image: ndarray, epsilon=2, method="bluredcanny", show=False
 ):
 
     # Put the image in greyscale if it's not the case
     try:
         if len(image.shape) == 2:
-            image = cv2.convertScaleAbs(image)
+            image = convertScaleAbs(image)
 
         elif image.shape[2] != 1:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            image = cvtColor(image, COLOR_BGR2GRAY)
 
     except ValueError as e:
         print(e)
         print(image.shape)
-        cv2.imshow("Error Image", image)
-        cv2.waitKey()
+        imshow("Error Image", image)
+        waitKey()
         
     if image.shape[0] > image.shape[1]:
-        image = np.transpose(image.copy())
+        image = transpose(image.copy())
         
     # processes the image using the chosen algorithm
-    imgBlur = cv2.GaussianBlur(image,(3,3),0)
+    imgBlur = GaussianBlur(image,(3,3),0)
     if method == "bluredcanny":
-        imgBlur = cv2.GaussianBlur(image, (3, 3), 0)
-        chosen = cv2.Canny(imgBlur, 50, 150)
+        imgBlur = GaussianBlur(image, (3, 3), 0)
+        chosen = Canny(imgBlur, 50, 150)
     elif method == "laplacian":
-        imgBlur = cv2.GaussianBlur(image, (3, 3), 0)
-        chosen = cv2.Laplacian(imgBlur, cv2.CV_64F, ksize=3, scale=1)
+        imgBlur = GaussianBlur(image, (3, 3), 0)
+        chosen = Laplacian(imgBlur, CV_64F, ksize=3, scale=1)
     elif method == "sobel":
-        x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3, scale=1)
-        y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3, scale=1)
-        absx = cv2.convertScaleAbs(x)
-        absy = cv2.convertScaleAbs(y)
-        edge = cv2.addWeighted(absx, 0.5, absy, 0.5, 0)
-        _, chosen = cv2.threshold(edge, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        x = Sobel(image, CV_64F, 1, 0, ksize=3, scale=1)
+        y = Sobel(image, CV_64F, 0, 1, ksize=3, scale=1)
+        absx = convertScaleAbs(x)
+        absy = convertScaleAbs(y)
+        edge = addWeighted(absx, 0.5, absy, 0.5, 0)
+        _, chosen = threshold(edge, 128, 255, THRESH_BINARY | THRESH_OTSU)
 
     else:
-        chosen = cv2.Canny(image, 50, 150)
+        chosen = Canny(image, 50, 150)
 
     # Close the image
     r = 5
-    kernel = np.ones((r, r), np.uint8)
-    chosen = cv2.morphologyEx(chosen, cv2.MORPH_CLOSE, kernel)
+    kernel = ones((r, r), uint8)
+    chosen = morphologyEx(chosen, MORPH_CLOSE, kernel)
 
     # Find contours
-    contours = cv2.findContours(
-        chosen, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE
+    contours = findContours(
+        chosen, mode=RETR_TREE, method=CHAIN_APPROX_SIMPLE
     )
     
-    contours = imutils.grab_contours(contours)
-    contours = sorted(contours, key = cv2.contourArea, reverse = True)
+    contours = grab_contours(contours)
+    contours = sorted(contours, key = contourArea, reverse = True)
 
     # Calculate the center of the image
     height, width = chosen.shape
@@ -92,7 +120,7 @@ def trajectory_computation(
     contours_approx = []
     for contour in contours:
     # Approximation des contours en polygones avec une précision de 2%
-        approx = cv2.approxPolyDP(contour, epsilon, True)
+        approx = approxPolyDP(contour, epsilon, True)
         
         # Convertir chaque contour approximé en une liste de tuples de points
         contour_points = [(point[0][0] - center_x, - point[0][1] + center_y) for point in approx]
@@ -115,6 +143,7 @@ def trajectory_computation(
     import matplotlib
     matplotlib.use("Agg")
     from matplotlib import pyplot as plt
+    from io import BytesIO
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -131,26 +160,17 @@ def trajectory_computation(
     if show:
         plt.show()
     # Save the plot as an image in a variable
-    from io import BytesIO
-
     buffer = BytesIO()
     plt.savefig(buffer, format="png", bbox_inches="tight", pad_inches=0)
     buffer.seek(0)
     image_buffer = buffer.getvalue()
     # Close the plot to free up memory
     plt.close(fig)
-    np_image = np.frombuffer(image_buffer, dtype=np.uint8)
-    preview = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+    np_image = frombuffer(image_buffer, dtype=uint8)
+    preview = imdecode(np_image, IMREAD_COLOR)
 
     # Fit the trajectories to an A4 paper
     points = fit_to_a4(contours_approx)
     nbPoints = len(points)
     nbContours = len(contours_approx)
     return points, nbPoints, nbContours, preview
-
-
-if __name__ == "__main__":
-    # Load the image
-    image_path = "image/amongus.jpg"
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    traj = trajectory_computation(image, 5, show=False)

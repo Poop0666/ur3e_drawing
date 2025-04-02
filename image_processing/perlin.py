@@ -1,8 +1,8 @@
 #Perlin Noise
 #Based on Javascript from p5.js (https://github.com/processing/p5.js/blob/master/src/math/noise.js)
 
-import math
-import random
+from math import cos, pi
+from random import random
 
 PERLIN_YWRAPB = 4
 PERLIN_YWRAP = 1<<PERLIN_YWRAPB
@@ -14,7 +14,7 @@ perlin_octaves = 4
 perlin_amp_falloff = 0.5
 
 def scaled_cosine(i):
-    return 0.5*(1.0-math.cos(i*math.pi))
+    return 0.5*(1.0-cos(i*pi))
 
 perlin = None
 
@@ -23,7 +23,7 @@ def noise(x,y=0,z=0):
     if perlin == None:
         perlin = []
         for i in range(0,PERLIN_SIZE+1):
-            perlin.append(random.random())
+            perlin.append(random())
     if x<0:x=-x
     if y<0:y=-y
     if z<0:z=-z
@@ -85,7 +85,7 @@ class LCG():
         self.c = 1013904223.0   
         self.seed = self.z = None
     def setSeed(self,val=None):
-        self.z = self.seed = (math.random()*self.m if val == None else val) >> 0
+        self.z = self.seed = (random()*self.m if val == None else val) >> 0
     def getSeed(self):
         return self.seed
     def rand(self):
@@ -99,5 +99,4 @@ def noiseSeed(seed):
     perlin = []
     for i in range(0,PERLIN_SIZE+1):
         perlin.append(lcg.rand())
-        
-        
+
