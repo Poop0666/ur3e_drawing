@@ -1,4 +1,15 @@
 import os
+import sys
+import subprocess
+
+try:
+    import win32com
+    import app
+except:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", '-r', 'requirement.txt'])
+finally:
+    import win32com
+    import app
 
 
 def create_shortcut(target, shortcut_name, ico):
@@ -19,8 +30,6 @@ def create_shortcut(target, shortcut_name, ico):
 
 
 if __name__ == "__main__":
-    os.system("python -m pip install -r requirements.txt")
-    import win32com.client
     target = os.path.join(os.path.dirname(__file__), "app.pyw")
     ico = os.path.join(os.path.dirname(__file__), "tools/robotic-arm.ico")
     create_shortcut(target, "UR3E", ico)
