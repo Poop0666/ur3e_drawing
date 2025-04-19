@@ -3,13 +3,14 @@ import sys
 import subprocess
 
 try:
-    import win32com
-    import app
+    import win32com.client
+    import config.imports
+    subprocess.check_call([sys.executable, "-m", "pip", "install", '-r', 'requirements.txt'])
 except:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", '-r', 'requirement.txt'])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", '-r', 'requirements.txt'])
 finally:
-    import win32com
-    import app
+    import win32com.client
+    import config.imports
 
 
 def create_shortcut(target, shortcut_name, ico):
